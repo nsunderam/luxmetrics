@@ -8,11 +8,12 @@ export default function DetailModal({ listing, currency, onClose }) {
 
   const reseller = RESELLERS.find(r => r.id === listing.resellerId)
   const priceInCurrency = convertCurrency(listing.priceUSD, currency)
-  const fmvInCurrency = convertCurrency(listing.fairValueUSD, currency)
-  const mispricing = listing.mispricingPct
-  const isUnderpriced = mispricing < -5
-  const isOverpriced = mispricing > 10
-  const savings = fmvInCurrency - priceInCurrency
+  const hasFMV = listing.fairValueUSD != null && listing.mispricingPct != null
+  const fmvInCurrency = hasFMV ? convertCurrency(listing.fairValueUSD, currency) : null
+  const mispricing = listing.mispricingPct ?? 0
+  const isUnderpriced = hasFMV && mispricing < -5
+  const isOverpriced = hasFMV && mispricing > 10
+  const savings = hasFMV ? fmvInCurrency - priceInCurrency : 0
 
   // Fetch all listings for this model from API
   const [allForModel, setAllForModel] = useState([])
@@ -69,7 +70,8 @@ export default function DetailModal({ listing, currency, onClose }) {
   const range = globalMax - globalMin || 1
 
   // FMV line position (use base FMV without condition adjustment for reference)
-  const baseFmvUSD = listing.fairValueUSD / (listing.condition === 'New' ? 1.0 : listing.condition === 'Excellent' ? 0.92 : listing.condition === 'Very Good' ? 0.82 : listing.condition === 'Good' ? 0.70 : 0.55)
+  const condMultiplier = listing.condition === 'New' ? 1.0 : listing.condition === 'Excellent' ? 0.92 : listing.condition === 'Very Good' ? 0.82 : listing.condition === 'Good' ? 0.70 : 0.55
+  const baseFmvUSD = hasFMV ? listing.fairValueUSD / condMultiplier : listing.priceUSD
 
   // Same model, same condition comparables for the table
   const comparables = allForModel
@@ -88,7 +90,7 @@ export default function DetailModal({ listing, currency, onClose }) {
           <div>
             <p className="text-[10px] text-black uppercase tracking-[0.2em] mb-1">{listing.brandName}</p>
             <h2 className="text-xl font-display font-semibold text-ivory">{listing.model}</h2>
-            <p className="text-sm text-silver mt-0.5">{listing.color} &middot; {listing.material} &middot; {listing.size}</p>
+            <p className="text-sm text-silver mt-0.5">{[listing.color, listing.material, listing.size].filter(Boolean).join(' \u00b7 ')}</p>
           </div>
           <button onClick={onClose} className="p-2 rounded-lg hover:bg-carbon transition-colors cursor-pointer">
             <X className="w-5 h-5 text-muted" />
@@ -109,31 +111,38 @@ export default function DetailModal({ listing, currency, onClose }) {
                 </div>
                 <div className="bg-carbon border border-graphite rounded-xl p-4">
                   <p className="text-[10px] text-muted uppercase tracking-wider mb-1">Fair Market Value</p>
-                  <p className="text-2xl font-bold text-black">{formatPrice(fmvInCurrency, currency)}</p>
+                  <p className="text-2xl font-bold text-black">{hasFMV ? formatPrice(fmvInCurrency, currency) : '--'}</p>
                   <p className="text-xs text-muted mt-1">{listing.condition} condition</p>
                 </div>
               </div>
 
               {/* Mispricing callout */}
-              <div className={`rounded-xl p-4 border ${isUnderpriced ? 'bg-emerald-accent/10 border-emerald-accent/30' : isOverpriced ? 'bg-rose-accent/10 border-rose-accent/30' : 'bg-carbon border-graphite'}`}>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-[10px] text-muted uppercase tracking-wider mb-1">Mispricing</p>
-                    <div className="flex items-center gap-2">
-                      {isUnderpriced ? <TrendingDown className="w-5 h-5 text-emerald-accent" /> : isOverpriced ? <TrendingUp className="w-5 h-5 text-rose-accent" /> : null}
-                      <p className={`text-2xl font-bold ${isUnderpriced ? 'text-emerald-accent' : isOverpriced ? 'text-rose-accent' : 'text-silver'}`}>
-                        {mispricing > 0 ? '+' : ''}{mispricing.toFixed(1)}%
-                      </p>
+              {hasFMV ? (
+                <div className={`rounded-xl p-4 border ${isUnderpriced ? 'bg-emerald-accent/10 border-emerald-accent/30' : isOverpriced ? 'bg-rose-accent/10 border-rose-accent/30' : 'bg-carbon border-graphite'}`}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-[10px] text-muted uppercase tracking-wider mb-1">Mispricing</p>
+                      <div className="flex items-center gap-2">
+                        {isUnderpriced ? <TrendingDown className="w-5 h-5 text-emerald-accent" /> : isOverpriced ? <TrendingUp className="w-5 h-5 text-rose-accent" /> : null}
+                        <p className={`text-2xl font-bold ${isUnderpriced ? 'text-emerald-accent' : isOverpriced ? 'text-rose-accent' : 'text-silver'}`}>
+                          {mispricing > 0 ? '+' : ''}{mispricing.toFixed(1)}%
+                        </p>
+                      </div>
                     </div>
+                    {isUnderpriced && savings > 0 && (
+                      <div className="text-right">
+                        <p className="text-[10px] text-muted uppercase tracking-wider mb-1">You Save</p>
+                        <p className="text-xl font-bold text-emerald-accent">{formatPrice(savings, currency)}</p>
+                      </div>
+                    )}
                   </div>
-                  {isUnderpriced && savings > 0 && (
-                    <div className="text-right">
-                      <p className="text-[10px] text-muted uppercase tracking-wider mb-1">You Save</p>
-                      <p className="text-xl font-bold text-emerald-accent">{formatPrice(savings, currency)}</p>
-                    </div>
-                  )}
                 </div>
-              </div>
+              ) : (
+                <div className="rounded-xl p-4 border bg-carbon border-graphite">
+                  <p className="text-[10px] text-muted uppercase tracking-wider mb-1">Mispricing</p>
+                  <p className="text-lg text-muted">No FMV data available for this model</p>
+                </div>
+              )}
 
               {/* Details row */}
               <div className="grid grid-cols-4 gap-2">
@@ -302,14 +311,16 @@ export default function DetailModal({ listing, currency, onClose }) {
                       <td className="px-4 py-2.5 text-muted">{listing.year}</td>
                       <td className="px-4 py-2.5 text-right text-ivory font-medium">{formatPrice(priceInCurrency, currency)}</td>
                       <td className={`px-4 py-2.5 text-right font-medium ${isUnderpriced ? 'text-emerald-accent' : isOverpriced ? 'text-rose-accent' : 'text-silver'}`}>
-                        {mispricing > 0 ? '+' : ''}{mispricing.toFixed(1)}%
+                        {hasFMV ? `${mispricing > 0 ? '+' : ''}${mispricing.toFixed(1)}%` : '--'}
                       </td>
                     </tr>
                     {comparables.map(c => {
                       const cReseller = RESELLERS.find(r => r.id === c.resellerId)
                       const cPrice = convertCurrency(c.priceUSD, currency)
-                      const cUnder = c.mispricingPct < -5
-                      const cOver = c.mispricingPct > 10
+                      const cMispricing = c.mispricingPct ?? 0
+                      const cHasFMV = c.mispricingPct != null
+                      const cUnder = cHasFMV && cMispricing < -5
+                      const cOver = cHasFMV && cMispricing > 10
                       return (
                         <tr key={c.id} className="border-b border-graphite/20 hover:bg-carbon/40">
                           <td className="px-4 py-2.5 text-silver">{cReseller?.name}</td>
@@ -317,7 +328,7 @@ export default function DetailModal({ listing, currency, onClose }) {
                           <td className="px-4 py-2.5 text-muted">{c.year}</td>
                           <td className="px-4 py-2.5 text-right text-ivory">{formatPrice(cPrice, currency)}</td>
                           <td className={`px-4 py-2.5 text-right font-medium ${cUnder ? 'text-emerald-accent' : cOver ? 'text-rose-accent' : 'text-silver'}`}>
-                            {c.mispricingPct > 0 ? '+' : ''}{c.mispricingPct.toFixed(1)}%
+                            {cHasFMV ? `${cMispricing > 0 ? '+' : ''}${cMispricing.toFixed(1)}%` : '--'}
                           </td>
                         </tr>
                       )
