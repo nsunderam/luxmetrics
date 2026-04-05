@@ -7,7 +7,7 @@
     "dev": "concurrently \"vite\" \"node server/index.js\"",
     "dev:frontend": "vite",
     "dev:server": "node server/index.js",
-    "build": "PLAYWRIGHT_BROWSERS_PATH=/opt/render/project/.playwright npx playwright install chromium && vite build",
+    "build": "npx playwright install --with-deps chromium && vite build",
     "start": "node server/index.js",
     "preview": "vite preview",
     "scrape": "node server/scrapers/run-manual.js",
