@@ -56,14 +56,14 @@ router.get('/', (req, res) => {
 
   // Sort
   const sortMap = {
-    'mispricing_asc': 'mispricingPct ASC',
-    'mispricing_desc': 'mispricingPct DESC',
+    'mispricing_asc': 'CASE WHEN mispricingPct IS NULL THEN 1 ELSE 0 END, mispricingPct ASC',
+    'mispricing_desc': 'CASE WHEN mispricingPct IS NULL THEN 1 ELSE 0 END, mispricingPct DESC',
     'price_asc': 'priceUSD ASC',
     'price_desc': 'priceUSD DESC',
     'days_desc': 'daysListed DESC',
     'days_asc': 'daysListed ASC',
   }
-  const orderBy = sortMap[sort] || 'mispricingPct ASC'
+  const orderBy = sortMap[sort] || sortMap['mispricing_asc']
 
   // Count total
   const countRow = db.prepare(`SELECT COUNT(*) as total FROM listings ${whereClause}`).get(...params)
