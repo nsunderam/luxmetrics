@@ -55,7 +55,7 @@ function startScheduler(db) {
         })
         tx()
 
-        db.prepare('UPDATE scrape_runs SET completedAt = datetime("now"), status = "completed", listingsFound = ?, listingsUpdated = ? WHERE id = ?')
+        db.prepare("UPDATE scrape_runs SET completedAt = datetime('now'), status = 'completed', listingsFound = ?, listingsUpdated = ? WHERE id = ?")
           .run(rawListings.length, count, runId)
 
         console.log(`[Scheduler] ${id}: ${rawListings.length} found, ${count} saved`)

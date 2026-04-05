@@ -113,12 +113,12 @@ async function runScraper(resellerId, db) {
     tx()
 
     // Update run log
-    db.prepare('UPDATE scrape_runs SET completedAt = datetime("now"), status = "completed", listingsFound = ?, listingsNew = ?, listingsUpdated = ? WHERE id = ?')
+    db.prepare("UPDATE scrape_runs SET completedAt = datetime('now'), status = 'completed', listingsFound = ?, listingsNew = ?, listingsUpdated = ? WHERE id = ?")
       .run(rawListings.length, newCount, updatedCount, runId)
 
     console.log(`Scrape complete: ${resellerId} - ${rawListings.length} found, ${newCount} new, ${updatedCount} updated`)
   } catch (err) {
-    db.prepare('UPDATE scrape_runs SET completedAt = datetime("now"), status = "failed", errorMessage = ? WHERE id = ?')
+    db.prepare("UPDATE scrape_runs SET completedAt = datetime('now'), status = 'failed', errorMessage = ? WHERE id = ?")
       .run(err.message, runId)
     throw err
   }
