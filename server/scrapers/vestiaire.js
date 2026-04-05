@@ -3,66 +3,81 @@ const BaseScraper = require('./base-scraper')
 class VestiaireScraper extends BaseScraper {
   constructor(config) {
     super('vestiaire', config)
-    this.baseUrl = 'https://www.vestiairecollective.com'
+    this.baseUrl = 'https://us.vestiairecollective.com'
   }
 
   getSearchUrls() {
     return [
-      `${this.baseUrl}/search/?q=hermes+birkin&category=bags`,
-      `${this.baseUrl}/search/?q=hermes+kelly&category=bags`,
-      `${this.baseUrl}/search/?q=chanel+classic+flap&category=bags`,
-      `${this.baseUrl}/search/?q=chanel+boy+bag&category=bags`,
-      `${this.baseUrl}/search/?q=louis+vuitton+neverfull&category=bags`,
-      `${this.baseUrl}/search/?q=louis+vuitton+speedy&category=bags`,
-      `${this.baseUrl}/search/?q=dior+lady+dior&category=bags`,
-      `${this.baseUrl}/search/?q=bottega+veneta+jodie&category=bags`,
+      this.baseUrl + '/search/?q=hermes+birkin',
+      this.baseUrl + '/search/?q=hermes+kelly',
+      this.baseUrl + '/search/?q=chanel+classic+flap',
+      this.baseUrl + '/search/?q=chanel+boy+bag',
+      this.baseUrl + '/search/?q=louis+vuitton+neverfull',
+      this.baseUrl + '/search/?q=dior+lady+dior',
+      this.baseUrl + '/search/?q=bottega+veneta+cassette',
+      this.baseUrl + '/search/?q=prada+galleria',
+      this.baseUrl + '/search/?q=fendi+peekaboo',
+      this.baseUrl + '/search/?q=loewe+puzzle',
     ]
   }
 
   async parseListings(page) {
     try {
-      await page.waitForSelector('[class*="product"], [data-testid*="product"], article', { timeout: 10000 })
+      await page.waitForSelector('[class*="productCard__sGjCz"]', { timeout: 10000 })
     } catch {
       console.warn('  No product cards found on page')
       return []
     }
 
-    const rawListings = await page.evaluate(() => {
-      const cards = document.querySelectorAll('[class*="productCard"], [data-testid*="product-card"], [class*="catalog__product"], article')
-      const results = []
+    const rawListings = await page.evaluate(function() {
+      var cards = document.querySelectorAll('a[class*="productCard__sGjCz"]')
+      var results = []
 
-      cards.forEach(card => {
+      cards.forEach(function(card) {
         try {
-          const titleEl = card.querySelector('[class*="title"], [class*="name"], h2, h3, p[class*="product"]')
-          const title = titleEl?.textContent?.trim()
+          var brandEl = card.querySelector('[class*="text--brand"]')
+          var nameEl = card.querySelector('[class*="text--name"]')
+          var priceEl = card.querySelector('[class*="text--price"] span')
+          var imgEl = card.querySelector('img')
+          var href = card.href
 
-          const priceEl = card.querySelector('[class*="price"], [data-testid*="price"]')
-          const priceText = priceEl?.textContent?.trim()
+          var brand = brandEl ? brandEl.textContent.trim() : ''
+          var name = nameEl ? nameEl.textContent.trim() : ''
+          var priceText = priceEl ? priceEl.textContent.trim() : ''
+          var imgSrc = imgEl ? (imgEl.src || imgEl.getAttribute('data-src')) : null
 
-          const imgEl = card.querySelector('img')
-          const imageUrl = imgEl?.src || imgEl?.getAttribute('data-src')
+          // Extract numeric ID from URL
+          var idMatch = href ? href.match(/(\d{6,})/) : null
+          var sourceId = idMatch ? idMatch[1] : null
 
-          const linkEl = card.querySelector('a')
-          const href = linkEl?.href || linkEl?.getAttribute('href')
-          const sourceUrl = href?.startsWith('http') ? href : (href ? `https://www.vestiairecollective.com${href}` : null)
+          var fullTitle = brand + ' ' + name
 
-          // Vestiaire URLs often contain a numeric ID
-          const sourceId = sourceUrl?.match(/(\d{6,})/)?.[1]
-
-          const condEl = card.querySelector('[class*="condition"]')
-          const rawCondition = condEl?.textContent?.trim()
-
-          if (title && priceText) {
-            results.push({ title, priceText, imageUrl, sourceUrl, sourceId, rawCondition })
+          if (fullTitle.trim() && priceText) {
+            results.push({
+              title: fullTitle,
+              priceText: priceText,
+              imageUrl: imgSrc,
+              sourceUrl: href,
+              sourceId: sourceId,
+              rawCondition: null
+            })
           }
-        } catch (e) {}
+        } catch(e) {}
       })
 
       return results
     })
 
+    // Detect currency from price format
+    var currency = 'USD'
+    if (rawListings.length > 0) {
+      var firstPrice = rawListings[0].priceText
+      if (firstPrice.includes('£')) currency = 'GBP'
+      else if (firstPrice.includes('€')) currency = 'EUR'
+    }
+
     return rawListings
-      .map(raw => this.normalizeListing({ ...raw, localCurrency: 'EUR' }))
+      .map(function(raw) { return this.normalizeListing(Object.assign({}, raw, { localCurrency: currency })) }.bind(this))
       .filter(Boolean)
   }
 }

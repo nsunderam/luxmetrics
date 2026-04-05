@@ -8,60 +8,64 @@ class RebagScraper extends BaseScraper {
 
   getSearchUrls() {
     return [
-      `${this.baseUrl}/collections/hermes-handbags?sort_by=created-descending`,
-      `${this.baseUrl}/collections/chanel-handbags?sort_by=created-descending`,
-      `${this.baseUrl}/collections/louis-vuitton-handbags?sort_by=created-descending`,
-      `${this.baseUrl}/collections/dior-handbags?sort_by=created-descending`,
-      `${this.baseUrl}/collections/bottega-veneta-handbags?sort_by=created-descending`,
-      `${this.baseUrl}/collections/fendi-handbags?sort_by=created-descending`,
-      `${this.baseUrl}/collections/prada-handbags?sort_by=created-descending`,
-      `${this.baseUrl}/collections/saint-laurent-handbags?sort_by=created-descending`,
+      this.baseUrl + '/shop/handbags/',
+      this.baseUrl + '/shop/handbags/?page=2',
+      this.baseUrl + '/shop/handbags/?page=3',
     ]
   }
 
   async parseListings(page) {
     try {
-      await page.waitForSelector('[class*="product"], [class*="ProductCard"], article', { timeout: 8000 })
+      await page.waitForSelector('.plp__product', { timeout: 10000 })
     } catch {
       console.warn('  No product cards found on page')
       return []
     }
 
-    const rawListings = await page.evaluate(() => {
-      const cards = document.querySelectorAll('[class*="ProductCard"], [class*="product-card"], .grid-item, article')
-      const results = []
+    const rawListings = await page.evaluate(function() {
+      var products = document.querySelectorAll('.plp__product')
+      var results = []
 
-      cards.forEach(card => {
+      products.forEach(function(card) {
         try {
-          const titleEl = card.querySelector('h2, h3, [class*="title"], [class*="name"]')
-          const title = titleEl?.textContent?.trim()
+          var brand = card.querySelector('.products-carousel__card-designer')
+          var titleEl = card.querySelector('.products-carousel__card-title')
+          var priceEl = card.querySelector('.rewards-plus-plp__product-price-value')
+          var linkEl = card.querySelector('a')
+          var imgEl = card.querySelector('img')
+          var condEl = card.querySelector('.products-carousel__tag')
 
-          const priceEl = card.querySelector('[class*="price"], [class*="Price"]')
-          const priceText = priceEl?.textContent?.trim()
+          var brandText = brand ? brand.textContent.trim() : ''
+          var titleText = titleEl ? titleEl.textContent.trim() : ''
+          var priceText = priceEl ? priceEl.textContent.trim() : ''
+          var href = linkEl ? linkEl.href : null
+          var imgSrc = imgEl ? (imgEl.src || imgEl.getAttribute('data-src')) : null
+          var rawCondition = condEl ? condEl.textContent.trim() : null
 
-          const imgEl = card.querySelector('img')
-          const imageUrl = imgEl?.src || imgEl?.getAttribute('data-src')
+          // Extract sourceId from URL path
+          var sourceId = href ? href.split('/').pop().split('?')[0] : null
 
-          const linkEl = card.querySelector('a')
-          const href = linkEl?.href || linkEl?.getAttribute('href')
-          const sourceUrl = href?.startsWith('http') ? href : (href ? `https://www.rebag.com${href}` : null)
+          // Combine brand + title for normalization
+          var fullTitle = brandText + ' ' + titleText
 
-          const sourceId = sourceUrl?.split('/').pop()?.split('?')[0]
-
-          const condEl = card.querySelector('[class*="condition"], [class*="Condition"]')
-          const rawCondition = condEl?.textContent?.trim()
-
-          if (title && priceText) {
-            results.push({ title, priceText, imageUrl, sourceUrl, sourceId, rawCondition })
+          if (fullTitle && priceText) {
+            results.push({
+              title: fullTitle,
+              priceText: priceText,
+              imageUrl: imgSrc,
+              sourceUrl: href,
+              sourceId: sourceId,
+              rawCondition: rawCondition
+            })
           }
-        } catch (e) {}
+        } catch(e) {}
       })
 
       return results
     })
 
     return rawListings
-      .map(raw => this.normalizeListing({ ...raw, localCurrency: 'USD' }))
+      .map(function(raw) { return this.normalizeListing(Object.assign({}, raw, { localCurrency: 'USD' })) }.bind(this))
       .filter(Boolean)
   }
 }

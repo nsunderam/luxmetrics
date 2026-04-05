@@ -7,7 +7,7 @@
     "dev": "concurrently \"vite\" \"node server/index.js\"",
     "dev:frontend": "vite",
     "dev:server": "node server/index.js",
-    "build": "vite build",
+    "build": "vite build && npx playwright install chromium --with-deps",
     "start": "node server/index.js",
     "preview": "vite preview",
     "scrape": "node server/scrapers/run-manual.js",

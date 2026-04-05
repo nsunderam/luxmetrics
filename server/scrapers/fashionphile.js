@@ -4,7 +4,7 @@ class FashionphileScraper {
   constructor(config) {
     this.resellerId = 'fashionphile'
     this.baseUrl = 'https://www.fashionphile.com'
-    this.config = { maxPages: 5, perPage: 50, ...config }
+    this.config = { maxPages: 10, perPage: 50, ...config }
   }
 
   async run() {
