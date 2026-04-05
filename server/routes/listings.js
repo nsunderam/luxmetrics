@@ -1,0 +1,100 @@
+const express = require('express')
+const router = express.Router()
+
+// GET /api/listings
+router.get('/', (req, res) => {
+  const db = req.db
+  const {
+    brand, condition, reseller, search,
+    minPrice, maxPrice, mispricingBelow,
+    sort = 'mispricing_asc',
+    page = 1, limit = 36,
+  } = req.query
+
+  let where = ['isActive = 1']
+  const params = []
+
+  if (brand) {
+    const brands = brand.split(',')
+    where.push(`brand IN (${brands.map(() => '?').join(',')})`)
+    params.push(...brands)
+  }
+
+  if (condition) {
+    const conditions = condition.split(',')
+    where.push(`condition IN (${conditions.map(() => '?').join(',')})`)
+    params.push(...conditions)
+  }
+
+  if (reseller) {
+    where.push('resellerId = ?')
+    params.push(reseller)
+  }
+
+  if (search) {
+    where.push('(brandName LIKE ? OR model LIKE ? OR color LIKE ? OR material LIKE ?)')
+    const term = `%${search}%`
+    params.push(term, term, term, term)
+  }
+
+  if (minPrice) {
+    where.push('priceUSD >= ?')
+    params.push(Number(minPrice))
+  }
+
+  if (maxPrice) {
+    where.push('priceUSD <= ?')
+    params.push(Number(maxPrice))
+  }
+
+  if (mispricingBelow) {
+    where.push('mispricingPct < ?')
+    params.push(Number(mispricingBelow))
+  }
+
+  const whereClause = where.length > 0 ? `WHERE ${where.join(' AND ')}` : ''
+
+  // Sort
+  const sortMap = {
+    'mispricing_asc': 'mispricingPct ASC',
+    'mispricing_desc': 'mispricingPct DESC',
+    'price_asc': 'priceUSD ASC',
+    'price_desc': 'priceUSD DESC',
+    'days_desc': 'daysListed DESC',
+    'days_asc': 'daysListed ASC',
+  }
+  const orderBy = sortMap[sort] || 'mispricingPct ASC'
+
+  // Count total
+  const countRow = db.prepare(`SELECT COUNT(*) as total FROM listings ${whereClause}`).get(...params)
+  const total = countRow.total
+
+  // Paginate
+  const offset = (Number(page) - 1) * Number(limit)
+  const rows = db.prepare(`SELECT * FROM listings ${whereClause} ORDER BY ${orderBy} LIMIT ? OFFSET ?`).all(...params, Number(limit), offset)
+
+  // Parse accessories JSON
+  const listings = rows.map(row => ({
+    ...row,
+    accessories: row.accessories ? JSON.parse(row.accessories) : [],
+  }))
+
+  res.json({
+    listings,
+    total,
+    page: Number(page),
+    totalPages: Math.ceil(total / Number(limit)),
+  })
+})
+
+// GET /api/listings/:id
+router.get('/:id', (req, res) => {
+  const db = req.db
+  const row = db.prepare('SELECT * FROM listings WHERE id = ?').get(req.params.id)
+  if (!row) return res.status(404).json({ error: 'Listing not found' })
+
+  row.accessories = row.accessories ? JSON.parse(row.accessories) : []
+  res.json(row)
+})
+
+module.exports = router

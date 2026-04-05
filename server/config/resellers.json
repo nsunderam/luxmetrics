@@ -1,0 +1,22 @@
+[
+  { "id": "fashionphile", "name": "Fashionphile", "country": "US", "currency": "USD", "region": "North America", "trustScore": 4.8, "scrapeEnabled": true },
+  { "id": "therealreal", "name": "The RealReal", "country": "US", "currency": "USD", "region": "North America", "trustScore": 4.5, "scrapeEnabled": false },
+  { "id": "rebag", "name": "Rebag", "country": "US", "currency": "USD", "region": "North America", "trustScore": 4.7, "scrapeEnabled": true },
+  { "id": "vestiaire", "name": "Vestiaire Collective", "country": "FR", "currency": "EUR", "region": "Europe", "trustScore": 4.3, "scrapeEnabled": true },
+  { "id": "collectorsquare", "name": "Collector Square", "country": "FR", "currency": "EUR", "region": "Europe", "trustScore": 4.6, "scrapeEnabled": false },
+  { "id": "xupes", "name": "Xupes", "country": "UK", "currency": "GBP", "region": "Europe", "trustScore": 4.7, "scrapeEnabled": false },
+  { "id": "luxurypromise", "name": "Luxury Promise", "country": "UK", "currency": "GBP", "region": "Europe", "trustScore": 4.5, "scrapeEnabled": false },
+  { "id": "loveluxury", "name": "Love Luxury", "country": "UK", "currency": "GBP", "region": "Europe", "trustScore": 4.4, "scrapeEnabled": false },
+  { "id": "labellov", "name": "Labellov", "country": "BE", "currency": "EUR", "region": "Europe", "trustScore": 4.4, "scrapeEnabled": false },
+  { "id": "saclabparis", "name": "SacLab", "country": "FR", "currency": "EUR", "region": "Europe", "trustScore": 4.6, "scrapeEnabled": false },
+  { "id": "brandoff", "name": "Brand Off", "country": "JP", "currency": "JPY", "region": "Asia", "trustScore": 4.4, "scrapeEnabled": false },
+  { "id": "reebonz", "name": "Reebonz", "country": "SG", "currency": "SGD", "region": "Asia", "trustScore": 4.2, "scrapeEnabled": false },
+  { "id": "luxcollect", "name": "LuxCollect", "country": "SG", "currency": "SGD", "region": "Asia", "trustScore": 4.3, "scrapeEnabled": false },
+  { "id": "bananasg", "name": "Banana Luxury", "country": "SG", "currency": "SGD", "region": "Asia", "trustScore": 4.1, "scrapeEnabled": false },
+  { "id": "prelovedbagsg", "name": "Preloved Lux SG", "country": "SG", "currency": "SGD", "region": "Asia", "trustScore": 4.0, "scrapeEnabled": false },
+  { "id": "darveys", "name": "Darveys", "country": "IN", "currency": "INR", "region": "Asia", "trustScore": 4.0, "scrapeEnabled": false },
+  { "id": "luxurygaragesale", "name": "Luxury Garage Sale", "country": "US", "currency": "USD", "region": "North America", "trustScore": 4.3, "scrapeEnabled": false },
+  { "id": "cresus", "name": "Cresus", "country": "FR", "currency": "EUR", "region": "Europe", "trustScore": 4.5, "scrapeEnabled": false },
+  { "id": "designerexchange", "name": "Designer Exchange", "country": "AE", "currency": "AED", "region": "Middle East", "trustScore": 4.3, "scrapeEnabled": false },
+  { "id": "catchys", "name": "Catchy's", "country": "KR", "currency": "KRW", "region": "Asia", "trustScore": 4.1, "scrapeEnabled": false }
+]
