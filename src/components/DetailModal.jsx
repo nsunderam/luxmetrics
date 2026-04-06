@@ -69,9 +69,8 @@ export default function DetailModal({ listing, currency, onClose }) {
   const globalMax = Math.max(...allPrices) * 1.05
   const range = globalMax - globalMin || 1
 
-  // FMV line position (use base FMV without condition adjustment for reference)
-  const condMultiplier = listing.condition === 'New' ? 1.0 : listing.condition === 'Excellent' ? 0.92 : listing.condition === 'Very Good' ? 0.82 : listing.condition === 'Good' ? 0.70 : 0.55
-  const baseFmvUSD = hasFMV ? listing.fairValueUSD / condMultiplier : listing.priceUSD
+  // FMV line position — use the same condition-adjusted FMV shown in header
+  const baseFmvUSD = hasFMV ? listing.fairValueUSD : listing.priceUSD
 
   // Same model, same condition comparables for the table
   const comparables = allForModel
