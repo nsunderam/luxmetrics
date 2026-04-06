@@ -15,6 +15,7 @@ export default function App() {
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [apiStats, setApiStats] = useState(null)
   const [filters, setFilters] = useState({
     search: '',
     brands: [],
@@ -56,6 +57,11 @@ export default function App() {
     return params.toString()
   }, [filters, page])
 
+  // Fetch global stats
+  useEffect(() => {
+    fetch('/api/stats').then(r => r.json()).then(setApiStats).catch(() => {})
+  }, [])
+
   // Fetch listings from API
   useEffect(() => {
     setLoading(true)
@@ -91,7 +97,7 @@ export default function App() {
 
       <main className="max-w-[1600px] mx-auto px-4 sm:px-6 py-6 space-y-6">
         {/* Stats */}
-        <StatsBar listings={listings} currency={currency} total={total} />
+        <StatsBar listings={listings} currency={currency} total={total} stats={apiStats} />
 
         {/* Analytics toggle */}
         <div className="flex items-center justify-between">
