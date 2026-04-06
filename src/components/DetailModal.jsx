@@ -63,14 +63,15 @@ export default function DetailModal({ listing, currency, onClose }) {
       .sort((a, b) => a.avgPriceUSD - b.avgPriceUSD)
   }, [allForModel, listing.id])
 
-  // Price range for the chart
-  const allPrices = resellerPricing.flatMap(r => [r.minPriceUSD, r.maxPriceUSD])
-  const globalMin = Math.min(...allPrices) * 0.9
-  const globalMax = Math.max(...allPrices) * 1.05
-  const range = globalMax - globalMin || 1
-
   // FMV line position — use the same condition-adjusted FMV shown in header
   const baseFmvUSD = hasFMV ? listing.fairValueUSD : listing.priceUSD
+
+  // Price range for the chart — include FMV so the scale is meaningful
+  const allPrices = resellerPricing.flatMap(r => [r.minPriceUSD, r.maxPriceUSD])
+  if (hasFMV) allPrices.push(baseFmvUSD)
+  const globalMin = Math.min(...allPrices) * 0.9
+  const globalMax = Math.max(...allPrices) * 1.1
+  const range = globalMax - globalMin || 1
 
   // Same model, same condition comparables for the table
   const comparables = allForModel
