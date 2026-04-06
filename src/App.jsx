@@ -37,6 +37,7 @@ export default function App() {
     if (filters.reseller) params.set('reseller', filters.reseller)
     if (filters.minPrice) params.set('minPrice', filters.minPrice)
     if (filters.maxPrice) params.set('maxPrice', filters.maxPrice)
+    if (filters.minResellers) params.set('minResellers', filters.minResellers)
     if (filters.mispricingOnly) params.set('mispricingBelow', '-10')
 
     // Map frontend sort names to API sort names

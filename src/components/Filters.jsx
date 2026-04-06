@@ -33,7 +33,7 @@ export default function Filters({ filters, onFilterChange }) {
 
   const activeFilterCount = filters.brands.length + filters.conditions.length
     + (filters.search ? 1 : 0) + (filters.mispricingOnly ? 1 : 0)
-    + (filters.reseller ? 1 : 0)
+    + (filters.reseller ? 1 : 0) + (filters.minResellers ? 1 : 0)
 
   const resetFilters = () => {
     onFilterChange({
@@ -43,6 +43,7 @@ export default function Filters({ filters, onFilterChange }) {
       sort: 'mispricing-asc',
       mispricingOnly: false,
       reseller: '',
+      minResellers: '',
       minPrice: '',
       maxPrice: '',
     })
@@ -176,6 +177,19 @@ export default function Filters({ filters, onFilterChange }) {
                 {RESELLERS.map(r => (
                   <option key={r.id} value={r.id}>{r.name} ({r.country})</option>
                 ))}
+              </select>
+            </div>
+
+            <div className="min-w-[160px]">
+              <label className="text-[11px] text-muted uppercase tracking-wider mb-2 block">Cross-Listed At</label>
+              <select
+                value={filters.minResellers || ''}
+                onChange={e => onFilterChange({ ...filters, minResellers: e.target.value })}
+                className="w-full px-3 py-2 bg-obsidian border border-graphite rounded-lg text-sm text-ivory focus:outline-none focus:border-gold/50"
+              >
+                <option value="">Any</option>
+                <option value="2">2+ Resellers</option>
+                <option value="3">3+ Resellers</option>
               </select>
             </div>
 

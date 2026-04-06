@@ -6,7 +6,7 @@ router.get('/', (req, res) => {
   const db = req.db
   const {
     brand, condition, reseller, search,
-    minPrice, maxPrice, mispricingBelow,
+    minPrice, maxPrice, mispricingBelow, minResellers,
     sort = 'mispricing_asc',
     page = 1, limit = 36,
   } = req.query
@@ -50,6 +50,11 @@ router.get('/', (req, res) => {
   if (mispricingBelow) {
     where.push('mispricingPct < ?')
     params.push(Number(mispricingBelow))
+  }
+
+  if (minResellers && Number(minResellers) > 1) {
+    where.push(`modelKey IN (SELECT modelKey FROM listings WHERE isActive = 1 GROUP BY modelKey HAVING COUNT(DISTINCT resellerId) >= ?)`)
+    params.push(Number(minResellers))
   }
 
   const whereClause = where.length > 0 ? `WHERE ${where.join(' AND ')}` : ''
