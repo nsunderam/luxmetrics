@@ -45,6 +45,15 @@ class FashionphileScraper {
     const title = product.title
     if (!title) return null
 
+    // Exclude non-bag accessories
+    const titleLower = title.toLowerCase()
+    const handle = (product.handle || '').toLowerCase()
+    const excludes = ['card holder', 'card case', 'cardholder', 'coin purse', 'wallet',
+      'key holder', 'keychain', 'phone case', 'belt', 'scarf', 'shoes', 'sneaker',
+      'watch', 'bracelet', 'necklace', 'earring', 'ring', 'brooch', 'sunglasses',
+      'notebook', 'agenda', 'passport']
+    if (excludes.some(function(e) { return titleLower.includes(e) || handle.includes(e.replace(/ /g, '-')) })) return null
+
     const vendor = (product.vendor || '').toLowerCase()
     let normalized = normalize(title, null, null)
     if (!normalized) normalized = normalize(vendor + ' ' + title, null, null)
