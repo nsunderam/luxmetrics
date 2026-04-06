@@ -8,12 +8,26 @@ export default function DetailModal({ listing, currency, onClose }) {
 
   const reseller = RESELLERS.find(r => r.id === listing.resellerId)
   const priceInCurrency = convertCurrency(listing.priceUSD, currency)
+
+  // Retail-based FMV
   const hasFMV = listing.fairValueUSD != null && listing.mispricingPct != null
   const fmvInCurrency = hasFMV ? convertCurrency(listing.fairValueUSD, currency) : null
   const mispricing = listing.mispricingPct ?? 0
   const isUnderpriced = hasFMV && mispricing < -5
   const isOverpriced = hasFMV && mispricing > 10
   const savings = hasFMV ? fmvInCurrency - priceInCurrency : 0
+
+  // Market-driven FMV
+  const hasMarketFMV = listing.marketFmvUSD != null && listing.marketMispricingPct != null
+  const marketFmvInCurrency = hasMarketFMV ? convertCurrency(listing.marketFmvUSD, currency) : null
+  const marketMispricing = listing.marketMispricingPct ?? 0
+  const isMarketUnder = hasMarketFMV && marketMispricing < -5
+  const isMarketOver = hasMarketFMV && marketMispricing > 10
+
+  // Retail base for explanation
+  const retailBase = listing.retailBaseUSD ? convertCurrency(listing.retailBaseUSD, currency) : null
+  const condMultiplier = { 'New': 100, 'Excellent': 92, 'Very Good': 82, 'Good': 70, 'Fair': 55 }
+  const condPct = condMultiplier[listing.condition] || 70
 
   // Fetch all listings for this model from API
   const [allForModel, setAllForModel] = useState([])
@@ -99,8 +113,9 @@ export default function DetailModal({ listing, currency, onClose }) {
 
         <div className="p-6 space-y-6">
           {/* Product Image + Quick Info */}
-          {listing.image && (
-            <div className="flex gap-6 items-start">
+          {/* Product Image + Dual FMV */}
+          <div className="flex gap-6 items-start">
+            {listing.image && (
               <div className="w-56 h-56 flex-shrink-0 bg-carbon border border-graphite rounded-xl overflow-hidden flex items-center justify-center">
                 <img
                   src={listing.image}
@@ -108,37 +123,65 @@ export default function DetailModal({ listing, currency, onClose }) {
                   className="max-w-full max-h-full object-contain p-3"
                 />
               </div>
-              <div className="flex-1 space-y-3">
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-carbon border border-graphite rounded-xl p-3">
-                    <p className="text-[10px] text-muted uppercase tracking-wider mb-0.5">Price</p>
-                    <p className="text-2xl font-bold text-ivory">{formatPrice(priceInCurrency, currency)}</p>
-                  </div>
-                  <div className="bg-carbon border border-graphite rounded-xl p-3">
-                    <p className="text-[10px] text-muted uppercase tracking-wider mb-0.5">FMV</p>
-                    <p className="text-2xl font-bold text-black">{hasFMV ? formatPrice(fmvInCurrency, currency) : '--'}</p>
-                  </div>
-                </div>
-                {hasFMV && isUnderpriced && savings > 0 && (
-                  <div className="bg-emerald-accent/10 border border-emerald-accent/30 rounded-xl p-3 text-center">
-                    <p className="text-lg font-bold text-emerald-accent">Save {formatPrice(savings, currency)}</p>
-                    <p className="text-[10px] text-emerald-accent/70">{mispricing.toFixed(1)}% below market value</p>
-                  </div>
-                )}
-                {listing.sourceUrl && (
-                  <a
-                    href={listing.sourceUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 w-full py-2.5 bg-black text-white text-sm font-medium rounded-xl hover:bg-black/80 transition-colors"
-                    onClick={e => e.stopPropagation()}
-                  >
-                    View on {reseller?.name || 'Reseller'} <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                )}
+            )}
+            <div className="flex-1 space-y-3">
+              {/* Listed Price */}
+              <div className="bg-carbon border border-graphite rounded-xl p-3">
+                <p className="text-[10px] text-muted uppercase tracking-wider mb-0.5">Listed Price</p>
+                <p className="text-2xl font-bold text-ivory">{formatPrice(priceInCurrency, currency)}</p>
               </div>
+
+              {/* Dual FMV Cards */}
+              <div className="grid grid-cols-2 gap-3">
+                {/* Retail FMV */}
+                <div className={`rounded-xl p-3 border ${isUnderpriced ? 'bg-emerald-accent/5 border-emerald-accent/30' : isOverpriced ? 'bg-rose-accent/5 border-rose-accent/30' : 'bg-carbon border-graphite'}`}>
+                  <p className="text-[10px] text-muted uppercase tracking-wider mb-0.5">Retail FMV</p>
+                  <p className={`text-lg font-bold ${isUnderpriced ? 'text-emerald-accent' : isOverpriced ? 'text-rose-accent' : 'text-ivory'}`}>
+                    {hasFMV ? formatPrice(fmvInCurrency, currency) : '--'}
+                  </p>
+                  {hasFMV && (
+                    <p className={`text-[10px] mt-1 font-semibold ${isUnderpriced ? 'text-emerald-accent' : isOverpriced ? 'text-rose-accent' : 'text-muted'}`}>
+                      {mispricing > 0 ? '+' : ''}{mispricing.toFixed(1)}% vs retail
+                    </p>
+                  )}
+                  {retailBase && (
+                    <p className="text-[9px] text-muted mt-0.5">
+                      {condPct}% of {formatPrice(retailBase, currency)} retail ({listing.condition})
+                    </p>
+                  )}
+                </div>
+
+                {/* Market FMV */}
+                <div className={`rounded-xl p-3 border ${isMarketUnder ? 'bg-emerald-accent/5 border-emerald-accent/30' : isMarketOver ? 'bg-rose-accent/5 border-rose-accent/30' : 'bg-carbon border-graphite'}`}>
+                  <p className="text-[10px] text-muted uppercase tracking-wider mb-0.5">Market Value</p>
+                  <p className={`text-lg font-bold ${isMarketUnder ? 'text-emerald-accent' : isMarketOver ? 'text-rose-accent' : 'text-ivory'}`}>
+                    {hasMarketFMV ? formatPrice(marketFmvInCurrency, currency) : '--'}
+                  </p>
+                  {hasMarketFMV && (
+                    <p className={`text-[10px] mt-1 font-semibold ${isMarketUnder ? 'text-emerald-accent' : isMarketOver ? 'text-rose-accent' : 'text-muted'}`}>
+                      {marketMispricing > 0 ? '+' : ''}{marketMispricing.toFixed(1)}% vs market
+                    </p>
+                  )}
+                  <p className="text-[9px] text-muted mt-0.5">
+                    Median of reseller listings
+                  </p>
+                </div>
+              </div>
+
+              {/* CTA */}
+              {listing.sourceUrl && (
+                <a
+                  href={listing.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full py-2.5 bg-black text-white text-sm font-medium rounded-xl hover:bg-black/80 transition-colors"
+                  onClick={e => e.stopPropagation()}
+                >
+                  View on {reseller?.name || 'Reseller'} <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              )}
             </div>
-          )}
+          </div>
 
           {/* Key Pricing (fallback if no image) */}
           {!listing.image && (

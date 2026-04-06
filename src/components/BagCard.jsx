@@ -32,11 +32,15 @@ export default function BagCard({ listing, currency, onClick }) {
   const reseller = RESELLERS.find(r => r.id === listing.resellerId)
   const priceInCurrency = convertCurrency(listing.priceUSD, currency)
   const hasFMV = listing.fairValueUSD != null && listing.mispricingPct != null
+  const hasMarketFMV = listing.marketFmvUSD != null && listing.marketMispricingPct != null
   const fmvInCurrency = hasFMV ? convertCurrency(listing.fairValueUSD, currency) : null
+  const marketFmvInCurrency = hasMarketFMV ? convertCurrency(listing.marketFmvUSD, currency) : null
   const mispricing = listing.mispricingPct ?? 0
+  const marketMispricing = listing.marketMispricingPct ?? 0
   const isUnderpriced = hasFMV && mispricing < -5
   const isOverpriced = hasFMV && mispricing > 10
-  const isDeal = hasFMV && mispricing < -10
+  const isMarketUnder = hasMarketFMV && marketMispricing < -5
+  const isDeal = (hasFMV && mispricing < -10) || (hasMarketFMV && marketMispricing < -10)
   const hasImage = listing.image && !imgError
 
   return (
@@ -115,16 +119,20 @@ export default function BagCard({ listing, currency, onClick }) {
         <p className="text-[10px] text-muted mb-3">{[listing.size, listing.color, listing.material].filter(Boolean).join(' · ') || '\u00a0'}</p>
 
         {/* Price */}
-        <div className="flex items-end justify-between mb-3">
-          <div>
-            <p className="text-xl font-bold text-ivory tracking-tight">{formatPrice(priceInCurrency, currency)}</p>
-            <p className="text-[10px] text-muted mt-0.5">{hasFMV ? `FMV ${formatPrice(fmvInCurrency, currency)}` : ''}</p>
+        <div className="mb-3">
+          <p className="text-xl font-bold text-ivory tracking-tight mb-1">{formatPrice(priceInCurrency, currency)}</p>
+          <div className="flex items-center gap-3 text-[10px]">
+            {hasFMV && (
+              <span className="text-muted">
+                Retail FMV <span className={isUnderpriced ? 'text-emerald-accent font-semibold' : isOverpriced ? 'text-rose-accent font-semibold' : 'text-silver'}>{formatPrice(fmvInCurrency, currency)}</span>
+              </span>
+            )}
+            {hasMarketFMV && (
+              <span className="text-muted">
+                Market <span className={isMarketUnder ? 'text-emerald-accent font-semibold' : 'text-silver'}>{formatPrice(marketFmvInCurrency, currency)}</span>
+              </span>
+            )}
           </div>
-          {hasFMV && isUnderpriced && (
-            <p className="text-[11px] font-semibold text-emerald-accent">
-              Save {formatPrice(fmvInCurrency - priceInCurrency, currency)}
-            </p>
-          )}
         </div>
 
         {/* Footer */}

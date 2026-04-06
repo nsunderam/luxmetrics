@@ -1,6 +1,6 @@
 const cron = require('node-cron')
 const { getAvailableScrapers, getScraper } = require('../scrapers/registry')
-const { calculateFMV, calculateMispricing } = require('./fmv')
+const { calculateFMV, calculateMarketFMV, calculateMispricing } = require('./fmv')
 const { getRates, convertToUSD, refreshRates } = require('./currency')
 
 async function runScrapeForReseller(id, db) {
@@ -71,7 +71,30 @@ async function runFullScrape(db) {
     await new Promise(r => setTimeout(r, 30000))
   }
 
+  // After all scraping, compute market-driven FMV for all listings
+  console.log('[Scheduler] Computing market-driven FMV...')
+  computeAllMarketFMV(db)
   console.log('[Scheduler] Scrape cycle complete.\n')
+}
+
+function computeAllMarketFMV(db) {
+  const modelKeys = db.prepare('SELECT DISTINCT modelKey FROM listings WHERE isActive = 1').all()
+  const update = db.prepare('UPDATE listings SET marketFmvUSD = ?, marketMispricingPct = ? WHERE id = ?')
+
+  const tx = db.transaction(() => {
+    for (const { modelKey } of modelKeys) {
+      const marketFmv = calculateMarketFMV(modelKey, db)
+      if (!marketFmv) continue
+
+      const listings = db.prepare('SELECT id, priceUSD FROM listings WHERE modelKey = ? AND isActive = 1').all(modelKey)
+      for (const l of listings) {
+        const mkt = calculateMispricing(l.priceUSD, marketFmv)
+        update.run(marketFmv, mkt, l.id)
+      }
+    }
+  })
+  tx()
+  console.log('  Market FMV computed for ' + modelKeys.length + ' model keys')
 }
 
 function startScheduler(db) {

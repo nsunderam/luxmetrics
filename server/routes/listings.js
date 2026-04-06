@@ -78,11 +78,20 @@ router.get('/', (req, res) => {
   const offset = (Number(page) - 1) * Number(limit)
   const rows = db.prepare(`SELECT * FROM listings ${whereClause} ORDER BY ${orderBy} LIMIT ? OFFSET ?`).all(...params, Number(limit), offset)
 
-  // Parse accessories JSON
-  const listings = rows.map(row => ({
-    ...row,
-    accessories: row.accessories ? JSON.parse(row.accessories) : [],
-  }))
+  // Parse accessories JSON and add retail base price
+  const fvCache = {}
+  const listings = rows.map(row => {
+    // Look up retail base value for explanation
+    if (!fvCache[row.modelKey]) {
+      const fv = db.prepare('SELECT baseValueUSD FROM fair_values WHERE modelKey = ?').get(row.modelKey)
+      fvCache[row.modelKey] = fv ? fv.baseValueUSD : null
+    }
+    return {
+      ...row,
+      accessories: row.accessories ? JSON.parse(row.accessories) : [],
+      retailBaseUSD: fvCache[row.modelKey],
+    }
+  })
 
   res.json({
     listings,

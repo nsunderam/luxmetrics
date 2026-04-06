@@ -1,7 +1,7 @@
 // Manual scrape runner: npm run scrape [resellerId]
 const { initDB } = require('../db/init')
 const { getAvailableScrapers, getScraper } = require('./registry')
-const { calculateFMV, calculateMispricing } = require('../services/fmv')
+const { calculateFMV, calculateMarketFMV, calculateMispricing } = require('../services/fmv')
 const { getRates, convertToUSD } = require('../services/currency')
 
 async function main() {
@@ -73,6 +73,24 @@ async function main() {
       console.error(`Failed: ${err.message}`)
     }
   }
+
+  // Compute market-driven FMV for all listings
+  console.log('\nComputing market-driven FMV...')
+  const modelKeys = db.prepare('SELECT DISTINCT modelKey FROM listings WHERE isActive = 1').all()
+  const updateMkt = db.prepare('UPDATE listings SET marketFmvUSD = ?, marketMispricingPct = ? WHERE id = ?')
+  const mktTx = db.transaction(() => {
+    for (const { modelKey } of modelKeys) {
+      const marketFmv = calculateMarketFMV(modelKey, db)
+      if (!marketFmv) continue
+      const rows = db.prepare('SELECT id, priceUSD FROM listings WHERE modelKey = ? AND isActive = 1').all(modelKey)
+      for (const r of rows) {
+        const mkt = calculateMispricing(r.priceUSD, marketFmv)
+        updateMkt.run(marketFmv, mkt, r.id)
+      }
+    }
+  })
+  mktTx()
+  console.log('Market FMV computed for ' + modelKeys.length + ' model keys')
 
   db.close()
   console.log('\nAll scrapes complete.')

@@ -27,6 +27,15 @@ function initDB() {
     seedCurrencyRates(db)
   }
 
+  // Migration: add market FMV columns if they don't exist
+  try {
+    db.prepare('SELECT marketFmvUSD FROM listings LIMIT 1').get()
+  } catch (e) {
+    db.exec('ALTER TABLE listings ADD COLUMN marketFmvUSD REAL')
+    db.exec('ALTER TABLE listings ADD COLUMN marketMispricingPct REAL')
+    console.log('Migrated: added marketFmvUSD, marketMispricingPct columns')
+  }
+
   console.log(`Database initialized at ${DB_PATH}`)
   return db
 }
