@@ -33,6 +33,8 @@ const MODEL_PATTERNS = {
     { pattern: /chanel\s*19.*?(small|medium|large)/i, model: 'Chanel 19', sizeGroup: 1 },
     { pattern: /chanel\s*19/i, model: 'Chanel 19', size: 'Medium' },
     { pattern: /wallet\s*on\s*chain|WOC/i, model: 'Wallet on Chain', size: 'WOC' },
+    { pattern: /small\s*deauville|deauville.*small/i, model: 'Deauville Tote', size: 'Small' },
+    { pattern: /medium\s*deauville|deauville.*medium/i, model: 'Deauville Tote', size: 'Medium' },
     { pattern: /deauville/i, model: 'Deauville Tote', size: 'Large' },
     { pattern: /gabrielle/i, model: 'Gabrielle Hobo', size: 'Medium' },
     { pattern: /2\.55\s*reissue|reissue.*?(mini|224|225|226|227)/i, model: '2.55 Reissue', size: '226' },
