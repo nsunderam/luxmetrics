@@ -6,10 +6,10 @@ const { getRates, convertToUSD } = require('../services/currency')
 
 async function main() {
   const db = initDB()
-  const targetReseller = process.argv[2]
+  const targets = process.argv.slice(2)
   const available = getAvailableScrapers()
 
-  const scrapersToRun = targetReseller ? [targetReseller] : available
+  const scrapersToRun = targets.length > 0 ? targets : available
 
   for (const id of scrapersToRun) {
     if (!available.includes(id)) {

@@ -11,6 +11,7 @@ const BRAND_PATTERNS = [
   { pattern: /fendi/i, brand: 'fendi', brandName: 'Fendi', tier: 'Luxury' },
   { pattern: /prada/i, brand: 'prada', brandName: 'Prada', tier: 'Luxury' },
   { pattern: /loewe/i, brand: 'loewe', brandName: 'Loewe', tier: 'Luxury' },
+  { pattern: /valentino\s*garavani|valentino/i, brand: 'valentino', brandName: 'Valentino', tier: 'Luxury' },
 ]
 
 // Model detection patterns per brand
@@ -92,6 +93,19 @@ const MODEL_PATTERNS = {
     { pattern: /puzzle/i, model: 'Puzzle', size: 'Small' },
     { pattern: /hammock\s*(mini|small|medium)/i, model: 'Hammock', sizeGroup: 1 },
     { pattern: /hammock/i, model: 'Hammock', size: 'Small' },
+  ],
+  valentino: [
+    { pattern: /rockstud\s*spike.*?(small|medium|large)/i, model: 'Rockstud Spike', sizeGroup: 1 },
+    { pattern: /rockstud\s*spike/i, model: 'Rockstud Spike', size: 'Medium' },
+    { pattern: /vsling.*?(mini|small|medium|large)/i, model: 'VSling', sizeGroup: 1 },
+    { pattern: /vsling/i, model: 'VSling', size: 'Medium' },
+    { pattern: /roman\s*stud.*?(small|medium|large)/i, model: 'Roman Stud', sizeGroup: 1 },
+    { pattern: /roman\s*stud/i, model: 'Roman Stud', size: 'Medium' },
+    { pattern: /one\s*stud.*?(small|medium|large)/i, model: 'One Stud', sizeGroup: 1 },
+    { pattern: /one\s*stud/i, model: 'One Stud', size: 'Medium' },
+    { pattern: /loco.*?(small|medium)/i, model: 'Locò', sizeGroup: 1 },
+    { pattern: /loco|locò/i, model: 'Locò', size: 'Small' },
+    { pattern: /garavani/i, model: 'Garavani', size: 'Medium' },
   ],
 }
 
@@ -178,6 +192,7 @@ function buildModelKey(model, size, materialSlug, brand) {
     hermes: '', chanel: 'chanel-', dior: 'dior-', louisvuitton: 'lv-',
     goyard: 'goyard-', bottega: 'bottega-', celine: 'celine-',
     ysl: 'ysl-', fendi: 'fendi-', prada: 'prada-', loewe: 'loewe-',
+    valentino: 'valentino-',
   }
 
   const prefix = brandPrefix[brand] || ''

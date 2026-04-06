@@ -1,72 +1,95 @@
-const BaseScraper = require('./base-scraper')
+const { normalize, parsePrice } = require('../services/normalizer')
 
-class RebagScraper extends BaseScraper {
+class RebagScraper {
   constructor(config) {
-    super('rebag', config)
-    this.baseUrl = 'https://www.rebag.com'
+    this.resellerId = 'rebag'
+    this.baseUrl = 'https://shop.rebag.com'
+    this.config = { maxPages: 10, perPage: 250, ...config }
   }
 
-  getSearchUrls() {
-    return [
-      this.baseUrl + '/shop/handbags/',
-      this.baseUrl + '/shop/handbags/?page=2',
-      this.baseUrl + '/shop/handbags/?page=3',
-    ]
+  async run() {
+    console.log('  Scraping Rebag via Shopify JSON API...')
+
+    // Rebag uses Shopify at shop.rebag.com — use /products.json (all products)
+    const allListings = await this.scrapeCollection('all')
+
+    console.log('  Total raw listings scraped: ' + allListings.length)
+    return allListings
   }
 
-  async parseListings(page) {
-    try {
-      await page.waitForSelector('.plp__product', { timeout: 10000 })
-    } catch {
-      console.warn('  No product cards found on page')
-      return []
+  async scrapeCollection(collection) {
+    const listings = []
+    let page = 1
+
+    while (page <= this.config.maxPages) {
+      const url = this.baseUrl + '/collections/' + collection + '/products.json?limit=' + this.config.perPage + '&page=' + page
+
+      try {
+        const res = await fetch(url)
+        if (!res.ok) break
+
+        const data = await res.json()
+        if (!data.products || data.products.length === 0) break
+
+        for (const product of data.products) {
+          const listing = this.parseProduct(product)
+          if (listing) listings.push(listing)
+        }
+
+        if (data.products.length < this.config.perPage) break
+        page++
+        await new Promise(function(r) { return setTimeout(r, 1000) })
+      } catch (err) {
+        console.warn('    Page ' + page + ' failed: ' + err.message)
+        break
+      }
     }
 
-    const rawListings = await page.evaluate(function() {
-      var products = document.querySelectorAll('.plp__product')
-      var results = []
+    return listings
+  }
 
-      products.forEach(function(card) {
-        try {
-          var brand = card.querySelector('.products-carousel__card-designer')
-          var titleEl = card.querySelector('.products-carousel__card-title')
-          var priceEl = card.querySelector('.rewards-plus-plp__product-price-value')
-          var linkEl = card.querySelector('a')
-          var imgEl = card.querySelector('img')
-          var condEl = card.querySelector('.products-carousel__tag')
+  parseProduct(product) {
+    const title = product.title
+    if (!title) return null
 
-          var brandText = brand ? brand.textContent.trim() : ''
-          var titleText = titleEl ? titleEl.textContent.trim() : ''
-          var priceText = priceEl ? priceEl.textContent.trim() : ''
-          var href = linkEl ? linkEl.href : null
-          var imgSrc = imgEl ? (imgEl.src || imgEl.getAttribute('data-src')) : null
-          var rawCondition = condEl ? condEl.textContent.trim() : null
+    const vendor = (product.vendor || '').toLowerCase()
+    let normalized = normalize(title, null, null)
+    if (!normalized) normalized = normalize(vendor + ' ' + title, null, null)
+    if (!normalized) return null
 
-          // Extract sourceId from URL path
-          var sourceId = href ? href.split('/').pop().split('?')[0] : null
+    const price = product.variants && product.variants[0] ? parseFloat(product.variants[0].price) : null
+    if (!price) return null
 
-          // Combine brand + title for normalization
-          var fullTitle = brandText + ' ' + titleText
+    const image = product.images && product.images[0] ? product.images[0].src : null
+    const handleMatch = (product.handle || '').match(/(\d{5,})$/)
+    const sourceId = handleMatch ? handleMatch[1] : (product.id ? String(product.id) : null)
 
-          if (fullTitle && priceText) {
-            results.push({
-              title: fullTitle,
-              priceText: priceText,
-              imageUrl: imgSrc,
-              sourceUrl: href,
-              sourceId: sourceId,
-              rawCondition: rawCondition
-            })
-          }
-        } catch(e) {}
-      })
+    const colors = ['Black','Gold','Etoupe','Etain','White','Beige','Navy','Red','Rouge','Pink','Rose','Blue','Bleu','Green','Vert','Grey','Gris','Brown','Tan','Cream','Orange','Yellow','Burgundy','Bordeaux']
+    let color = null
+    for (const c of colors) {
+      if (title.toLowerCase().includes(c.toLowerCase())) { color = c; break }
+    }
 
-      return results
-    })
-
-    return rawListings
-      .map(function(raw) { return this.normalizeListing(Object.assign({}, raw, { localCurrency: 'USD' })) }.bind(this))
-      .filter(Boolean)
+    return {
+      brand: normalized.brand,
+      brandName: normalized.brandName,
+      tier: normalized.tier,
+      model: normalized.model,
+      modelKey: normalized.modelKey,
+      material: normalized.material,
+      size: normalized.size,
+      color: color,
+      hardware: null,
+      condition: 'Good',
+      year: null,
+      accessories: [],
+      localPrice: price,
+      localCurrency: 'USD',
+      image: image,
+      sourceUrl: this.baseUrl + '/products/' + product.handle,
+      sourceId: sourceId,
+      daysListed: 1,
+    }
   }
 }
 
