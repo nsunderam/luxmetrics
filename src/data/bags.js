@@ -86,6 +86,7 @@ const BRANDS = {
   fendi: { name: 'Fendi', tier: 'Luxury' },
   prada: { name: 'Prada', tier: 'Luxury' },
   loewe: { name: 'Loewe', tier: 'Luxury' },
+  valentino: { name: 'Valentino', tier: 'Luxury' },
 }
 
 const CONDITIONS = ['New', 'Excellent', 'Very Good', 'Good', 'Fair']
