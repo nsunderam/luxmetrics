@@ -6,16 +6,16 @@ export default function StatsBar({ listings, currency, total, stats: apiStats })
   const uniqueBrands = apiStats?.brands || new Set(listings.map(l => l.brand)).size
   const uniqueResellers = apiStats?.resellers || new Set(listings.map(l => l.resellerId)).size
 
-  const underpriced = listings.filter(l => l.mispricingPct < -10)
-  const overpriced = listings.filter(l => l.mispricingPct > 15)
+  const underpriced = apiStats?.underpriced || listings.filter(l => l.mispricingPct < -10).length
+  const overpriced = apiStats?.overpriced || listings.filter(l => l.mispricingPct > 15).length
 
-  const bestDeal = listings.reduce((best, l) =>
+  const bestDeal = apiStats?.bestDeal || listings.reduce((best, l) =>
     l.mispricingPct < (best?.mispricingPct ?? 0) ? l : best
   , null)
 
-  const avgMispricing = listings.length > 0
-    ? listings.reduce((s, l) => s + Math.abs(l.mispricingPct), 0) / listings.length
-    : 0
+  const avgMispricing = apiStats?.avgMispricing || (listings.length > 0
+    ? listings.reduce((s, l) => s + Math.abs(l.mispricingPct || 0), 0) / listings.length
+    : 0)
 
   const stats = [
     {
@@ -27,7 +27,7 @@ export default function StatsBar({ listings, currency, total, stats: apiStats })
     },
     {
       label: 'Underpriced',
-      value: underpriced.length,
+      value: underpriced.toLocaleString ? underpriced.toLocaleString() : underpriced,
       sub: '> 10% below FMV',
       icon: TrendingDown,
       color: 'text-emerald-accent',
@@ -35,7 +35,7 @@ export default function StatsBar({ listings, currency, total, stats: apiStats })
     },
     {
       label: 'Overpriced',
-      value: overpriced.length,
+      value: overpriced.toLocaleString ? overpriced.toLocaleString() : overpriced,
       sub: '> 15% above FMV',
       icon: TrendingUp,
       color: 'text-rose-accent',
@@ -43,24 +43,25 @@ export default function StatsBar({ listings, currency, total, stats: apiStats })
     },
     {
       label: 'Best Deal',
-      value: bestDeal ? `${bestDeal.mispricingPct.toFixed(0)}%` : 'N/A',
-      sub: bestDeal ? `${bestDeal.brandName} ${bestDeal.model}` : '',
+      value: bestDeal?.mispricingPct != null ? `${bestDeal.mispricingPct.toFixed(0)}%` : 'N/A',
+      sub: bestDeal?.name || (bestDeal?.brandName ? `${bestDeal.brandName} ${bestDeal.model}` : ''),
       icon: Gem,
-      color: 'text-gold',
-      bg: 'bg-gold/10',
+      color: 'text-emerald-accent',
+      bg: 'bg-emerald-accent/10',
+      highlight: true,
     },
     {
       label: 'Avg Mispricing',
-      value: `${avgMispricing.toFixed(1)}%`,
+      value: `${Number(avgMispricing).toFixed(1)}%`,
       sub: `Across ${uniqueResellers} resellers`,
       icon: AlertTriangle,
       color: 'text-amber-accent',
       bg: 'bg-amber-accent/10',
     },
     {
-      label: 'Global Coverage',
+      label: 'Coverage',
       value: `${uniqueResellers} Resellers`,
-      sub: `${uniqueBrands} brands`,
+      sub: `${uniqueBrands} brands tracked`,
       icon: Globe,
       color: 'text-blue-accent',
       bg: 'bg-blue-accent/10',
@@ -72,7 +73,12 @@ export default function StatsBar({ listings, currency, total, stats: apiStats })
       {stats.map((s, i) => (
         <div
           key={s.label}
-          className="bg-carbon border border-graphite rounded-xl p-4 animate-fade-in"
+          className={`rounded-xl p-4 animate-fade-in transition-all duration-300 hover:shadow-md
+            ${s.highlight
+              ? 'bg-gradient-to-br from-emerald-accent/5 to-emerald-accent/15 border-2 border-emerald-accent/30 hover:border-emerald-accent/50'
+              : 'bg-carbon border border-graphite hover:border-steel'
+            }
+          `}
           style={{ animationDelay: `${i * 60}ms` }}
         >
           <div className="flex items-center gap-2 mb-2">
@@ -81,7 +87,7 @@ export default function StatsBar({ listings, currency, total, stats: apiStats })
             </div>
             <span className="text-[11px] text-muted uppercase tracking-wider">{s.label}</span>
           </div>
-          <p className={`text-xl font-semibold ${s.color}`}>{s.value}</p>
+          <p className={`text-xl font-bold ${s.color}`}>{s.value}</p>
           {s.sub && <p className="text-[10px] text-muted mt-0.5 truncate">{s.sub}</p>}
         </div>
       ))}

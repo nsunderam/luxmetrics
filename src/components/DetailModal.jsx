@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from 'react'
-import { X, TrendingDown, TrendingUp, MapPin, Clock, Star, Package, Calendar, Tag, ArrowRight } from 'lucide-react'
+import { X, TrendingDown, TrendingUp, MapPin, Clock, Star, Package, Calendar, Tag, ArrowRight, ExternalLink } from 'lucide-react'
 import { formatPrice, convertCurrency, CURRENCIES } from '../data/currencies'
 import { RESELLERS } from '../data/resellers'
 
@@ -98,7 +98,50 @@ export default function DetailModal({ listing, currency, onClose }) {
         </div>
 
         <div className="p-6 space-y-6">
-          {/* Key Pricing */}
+          {/* Product Image + Quick Info */}
+          {listing.image && (
+            <div className="flex gap-6 items-start">
+              <div className="w-56 h-56 flex-shrink-0 bg-carbon border border-graphite rounded-xl overflow-hidden flex items-center justify-center">
+                <img
+                  src={listing.image}
+                  alt={`${listing.brandName} ${listing.model}`}
+                  className="max-w-full max-h-full object-contain p-3"
+                />
+              </div>
+              <div className="flex-1 space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-carbon border border-graphite rounded-xl p-3">
+                    <p className="text-[10px] text-muted uppercase tracking-wider mb-0.5">Price</p>
+                    <p className="text-2xl font-bold text-ivory">{formatPrice(priceInCurrency, currency)}</p>
+                  </div>
+                  <div className="bg-carbon border border-graphite rounded-xl p-3">
+                    <p className="text-[10px] text-muted uppercase tracking-wider mb-0.5">FMV</p>
+                    <p className="text-2xl font-bold text-black">{hasFMV ? formatPrice(fmvInCurrency, currency) : '--'}</p>
+                  </div>
+                </div>
+                {hasFMV && isUnderpriced && savings > 0 && (
+                  <div className="bg-emerald-accent/10 border border-emerald-accent/30 rounded-xl p-3 text-center">
+                    <p className="text-lg font-bold text-emerald-accent">Save {formatPrice(savings, currency)}</p>
+                    <p className="text-[10px] text-emerald-accent/70">{mispricing.toFixed(1)}% below market value</p>
+                  </div>
+                )}
+                {listing.sourceUrl && (
+                  <a
+                    href={listing.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full py-2.5 bg-black text-white text-sm font-medium rounded-xl hover:bg-black/80 transition-colors"
+                    onClick={e => e.stopPropagation()}
+                  >
+                    View on {reseller?.name || 'Reseller'} <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Key Pricing (fallback if no image) */}
+          {!listing.image && (
           <div>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
@@ -161,6 +204,20 @@ export default function DetailModal({ listing, currency, onClose }) {
               </div>
             </div>
           </div>
+          )}
+
+          {/* View on Reseller CTA (if image layout didn't show it) */}
+          {!listing.image && listing.sourceUrl && (
+            <a
+              href={listing.sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 w-full py-3 bg-black text-white text-sm font-medium rounded-xl hover:bg-black/80 transition-colors"
+              onClick={e => e.stopPropagation()}
+            >
+              View on {reseller?.name || 'Reseller'} <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          )}
 
           {/* Accessories */}
           {listing.accessories.length > 0 && (

@@ -5,7 +5,7 @@ import Filters from './components/Filters'
 import BagCard from './components/BagCard'
 import DetailModal from './components/DetailModal'
 import MispricingChart from './components/MispricingChart'
-import { LayoutGrid, BarChart3, Loader2 } from 'lucide-react'
+import { LayoutGrid, BarChart3, Loader2, Diamond, Search } from 'lucide-react'
 
 export default function App() {
   const [currency, setCurrency] = useState('USD')
@@ -96,6 +96,16 @@ export default function App() {
       <Header currency={currency} onCurrencyChange={setCurrency} />
 
       <main className="max-w-[1600px] mx-auto px-4 sm:px-6 py-6 space-y-6">
+        {/* Hero */}
+        <div className="text-center py-6 animate-fade-in">
+          <h1 className="text-3xl sm:text-4xl font-display font-semibold text-ivory tracking-tight">
+            Luxury bags, <span className="bg-gradient-to-r from-emerald-accent to-blue-accent bg-clip-text text-transparent">priced below market</span>
+          </h1>
+          <p className="text-sm text-muted mt-2 tracking-wide">
+            {apiStats ? `${apiStats.totalListings.toLocaleString()} bags` : '...'} · {apiStats?.resellers || '...'} resellers · {apiStats?.brands || '...'} brands · Updated live
+          </p>
+        </div>
+
         {/* Stats */}
         <StatsBar listings={listings} currency={currency} total={total} stats={apiStats} />
 
@@ -139,6 +149,22 @@ export default function App() {
         {/* Grid View */}
         {view === 'grid' && !error && (
           <>
+            {loading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {Array.from({ length: 12 }).map((_, i) => (
+                  <div key={i} className="bg-white border border-graphite rounded-xl overflow-hidden animate-fade-in" style={{ animationDelay: `${i * 40}ms` }}>
+                    <div className="h-52 shimmer" />
+                    <div className="p-4 space-y-3">
+                      <div className="h-4 w-3/4 rounded shimmer" />
+                      <div className="h-3 w-1/2 rounded shimmer" />
+                      <div className="h-6 w-2/3 rounded shimmer" />
+                      <div className="h-px bg-graphite/50" />
+                      <div className="h-3 w-1/3 rounded shimmer" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {listings.map((listing, i) => (
                 <div key={listing.id} style={{ animationDelay: `${i * 30}ms` }} className="animate-fade-in">
@@ -150,6 +176,7 @@ export default function App() {
                 </div>
               ))}
             </div>
+            )}
 
             {/* Pagination */}
             {totalPages > 1 && (
