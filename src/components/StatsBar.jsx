@@ -1,8 +1,8 @@
 import { TrendingDown, TrendingUp, Package, Globe, AlertTriangle, Gem } from 'lucide-react'
 import { formatPrice, convertCurrency } from '../data/currencies'
 
-export default function StatsBar({ listings, currency }) {
-  const totalListings = listings.length
+export default function StatsBar({ listings, currency, total }) {
+  const totalListings = total || listings.length
   const uniqueBrands = new Set(listings.map(l => l.brand)).size
   const uniqueResellers = new Set(listings.map(l => l.resellerId)).size
 

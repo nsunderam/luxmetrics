@@ -90,7 +90,7 @@ export default function App() {
 
       <main className="max-w-[1600px] mx-auto px-4 sm:px-6 py-6 space-y-6">
         {/* Stats */}
-        <StatsBar listings={listings} currency={currency} />
+        <StatsBar listings={listings} currency={currency} total={total} />
 
         {/* Analytics toggle */}
         <div className="flex items-center justify-between">
