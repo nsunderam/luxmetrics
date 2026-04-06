@@ -17,11 +17,11 @@ export default function Header({ currency, onCurrencyChange }) {
   const cur = CURRENCIES[currency]
 
   return (
-    <header className="sticky top-0 z-50 border-b border-graphite/50 glass">
+    <header className="sticky top-0 z-50 border-b border-graphite glass">
       <div className="max-w-[1600px] mx-auto px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center shadow-lg shadow-gold/20">
-            <Diamond className="w-5 h-5 text-midnight" />
+          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center shadow-md shadow-gold/20">
+            <Diamond className="w-5 h-5 text-white" />
           </div>
           <div>
             <h1 className="font-display text-xl font-semibold text-ivory tracking-wide">LuxMetrics</h1>
@@ -46,7 +46,7 @@ export default function Header({ currency, onCurrencyChange }) {
             </button>
 
             {open && (
-              <div className="absolute right-0 top-full mt-2 w-52 bg-carbon border border-graphite rounded-xl shadow-2xl shadow-black/30 overflow-hidden animate-fade-in">
+              <div className="absolute right-0 top-full mt-2 w-52 bg-white border border-graphite rounded-xl shadow-2xl shadow-black/10 overflow-hidden animate-fade-in">
                 <div className="p-2">
                   {SELECTABLE_CURRENCIES.map(code => {
                     const c = CURRENCIES[code]
@@ -56,8 +56,8 @@ export default function Header({ currency, onCurrencyChange }) {
                         onClick={() => { onCurrencyChange(code); setOpen(false) }}
                         className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors cursor-pointer
                           ${currency === code
-                            ? 'bg-gold/10 text-gold font-semibold'
-                            : 'hover:bg-graphite text-pearl'
+                            ? 'bg-gold/10 text-gold-dark font-semibold'
+                            : 'hover:bg-carbon text-pearl'
                           }`}
                       >
                         <span className="text-lg">{c.flag}</span>

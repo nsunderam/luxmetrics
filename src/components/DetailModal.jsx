@@ -96,7 +96,7 @@ export default function DetailModal({ listing, currency, onClose }) {
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" onClick={onClose}>
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
       <div
-        className="relative w-full max-w-4xl max-h-[92vh] overflow-y-auto bg-obsidian border border-graphite rounded-2xl shadow-2xl shadow-black/40 animate-fade-in"
+        className="relative w-full max-w-4xl max-h-[92vh] overflow-y-auto bg-white border border-graphite rounded-2xl shadow-2xl shadow-black/10 animate-fade-in"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
