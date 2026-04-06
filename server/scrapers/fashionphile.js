@@ -45,14 +45,23 @@ class FashionphileScraper {
     const title = product.title
     if (!title) return null
 
-    // Exclude non-bag accessories
+    // Exclude non-bag items
     const titleLower = title.toLowerCase()
     const handle = (product.handle || '').toLowerCase()
-    const excludes = ['card holder', 'card case', 'cardholder', 'coin purse', 'wallet',
-      'key holder', 'keychain', 'phone case', 'belt', 'scarf', 'shoes', 'sneaker',
-      'watch', 'bracelet', 'necklace', 'earring', 'ring', 'brooch', 'sunglasses',
-      'notebook', 'agenda', 'passport']
-    if (excludes.some(function(e) { return titleLower.includes(e) || handle.includes(e.replace(/ /g, '-')) })) return null
+    const combined = titleLower + ' ' + handle
+    const excludes = [
+      'card holder', 'card case', 'cardholder', 'coin purse', 'coin pouch',
+      'wallet on chain', 'wallet-on-chain', 'woc',
+      'wallet', 'key holder', 'key ring', 'keychain', 'phone case', 'phone pouch',
+      'belt bag', 'belt-bag', 'chain belt',
+      'pochette', 'pouch crossbody', 'mini pouch', 'extra mini',
+      'scarf', 'shoes', 'sneaker', 'sandal', 'boot', 'loafer', 'heel', 'flat',
+      'watch', 'bracelet', 'necklace', 'earring', 'brooch', 'cufflink',
+      'sunglasses', 'eyeglasses', 'hat', 'beanie', 'gloves', 'cap',
+      'notebook', 'agenda', 'passport', 'luggage tag', 'bookmark',
+      'cosmetic case', 'vanity', 'jewelry box', 'pencil case',
+    ]
+    if (excludes.some(function(e) { return combined.includes(e) })) return null
 
     const vendor = (product.vendor || '').toLowerCase()
     let normalized = normalize(title, null, null)

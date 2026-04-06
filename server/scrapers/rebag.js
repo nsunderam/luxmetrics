@@ -57,22 +57,25 @@ class RebagScraper {
     const ptype = (product.product_type || '').toLowerCase()
     const titleLower = title.toLowerCase()
 
-    // Exclude accessories: card holders, wallets, phone cases, keychains, etc.
-    const excludePatterns = [
+    // Exclude non-bag items
+    const combined = titleLower + ' ' + handle
+    const excludes = [
       'card holder', 'card case', 'cardholder', 'coin purse', 'coin pouch',
+      'wallet on chain', 'wallet-on-chain', 'woc',
       'wallet', 'key holder', 'key ring', 'keychain', 'phone case', 'phone pouch',
-      'belt', 'scarf', 'shoes', 'sneaker', 'sandal', 'boot', 'loafer',
-      'watch', 'bracelet', 'necklace', 'earring', 'ring', 'brooch',
-      'sunglasses', 'eyeglasses', 'hat', 'beanie', 'gloves',
-      'notebook', 'agenda', 'passport', 'luggage-tag', 'bookmark',
+      'belt bag', 'belt-bag', 'chain belt',
+      'pochette', 'pouch crossbody', 'mini pouch', 'extra mini',
+      'scarf', 'shoes', 'sneaker', 'sandal', 'boot', 'loafer', 'heel', 'flat',
+      'watch', 'bracelet', 'necklace', 'earring', 'brooch', 'cufflink',
+      'sunglasses', 'eyeglasses', 'hat', 'beanie', 'gloves', 'cap',
+      'notebook', 'agenda', 'passport', 'luggage tag', 'bookmark',
+      'cosmetic case', 'vanity', 'jewelry box', 'pencil case',
+      'ipad case', 'laptop sleeve', 'tech case',
     ]
-    const isExcluded = excludePatterns.some(function(p) {
-      return handle.includes(p.replace(/ /g, '-')) || titleLower.includes(p)
-    })
-    if (isExcluded) return null
+    if (excludes.some(function(e) { return combined.includes(e) })) return null
 
-    // Also check if handle starts with "accessories-" which Rebag uses for non-bag items
-    if (handle.startsWith('accessories-') && !handle.includes('bag') && !handle.includes('tote') && !handle.includes('clutch')) return null
+    // Rebag uses "accessories-" prefix for non-bag items
+    if (handle.startsWith('accessories-') && !handle.includes('bag') && !handle.includes('tote') && !handle.includes('clutch') && !handle.includes('satchel')) return null
 
     const vendor = (product.vendor || '').toLowerCase()
     let normalized = normalize(title, null, null)

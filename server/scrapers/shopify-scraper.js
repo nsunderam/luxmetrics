@@ -85,6 +85,28 @@ class ShopifyScraper {
     const title = product.title
     if (!title) return null
 
+    // Exclude non-bag items
+    const titleLower = title.toLowerCase()
+    const handle = (product.handle || '').toLowerCase()
+    const combined = titleLower + ' ' + handle
+    const excludes = [
+      'card holder', 'card case', 'cardholder', 'coin purse', 'coin pouch',
+      'wallet on chain', 'wallet-on-chain', 'woc',
+      'wallet', 'key holder', 'key ring', 'keychain', 'phone case', 'phone pouch',
+      'belt bag', 'belt-bag', 'chain belt',
+      'pochette', 'pouch crossbody', 'mini pouch', 'extra mini',
+      'scarf', 'shoes', 'sneaker', 'sandal', 'boot', 'loafer', 'heel', 'flat',
+      'watch', 'bracelet', 'necklace', 'earring', 'brooch', 'cufflink',
+      'sunglasses', 'eyeglasses', 'hat', 'beanie', 'gloves', 'cap',
+      'notebook', 'agenda', 'passport', 'luggage tag', 'bookmark',
+      'cosmetic case', 'vanity', 'jewelry box', 'pencil case',
+      'ipad case', 'laptop sleeve', 'tech case',
+    ]
+    if (excludes.some(function(e) { return combined.includes(e) })) return null
+
+    // Also exclude if handle starts with "accessories-" and doesn't contain bag keywords
+    if (handle.startsWith('accessories-') && !handle.includes('bag') && !handle.includes('tote') && !handle.includes('clutch') && !handle.includes('satchel')) return null
+
     // Try title first (often already includes brand), then with vendor prefix
     let normalized = normalize(title, null, null)
     if (!normalized) {
