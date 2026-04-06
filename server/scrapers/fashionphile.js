@@ -55,11 +55,14 @@ class FashionphileScraper {
       'wallet', 'key holder', 'key ring', 'keychain', 'phone case', 'phone pouch',
       'belt bag', 'belt-bag', 'chain belt',
       'pochette', 'pouch crossbody', 'mini pouch', 'extra mini',
+      'clutch', 'chain clutch', 'camera bag', 'camera case',
+      'mini bag', 'nano bag', 'micro bag',
       'scarf', 'shoes', 'sneaker', 'sandal', 'boot', 'loafer', 'heel', 'flat',
       'watch', 'bracelet', 'necklace', 'earring', 'brooch', 'cufflink',
       'sunglasses', 'eyeglasses', 'hat', 'beanie', 'gloves', 'cap',
       'notebook', 'agenda', 'passport', 'luggage tag', 'bookmark',
       'cosmetic case', 'vanity', 'jewelry box', 'pencil case',
+      'cover', 'defender', 'strap', 'charm', 'twilly',
     ]
     if (excludes.some(function(e) { return combined.includes(e) })) return null
 
