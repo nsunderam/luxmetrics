@@ -47,6 +47,10 @@ async function runScrapeForReseller(id, db) {
       .run(now, rawListings.length, count, runId)
 
     console.log(`[Scheduler] ${id}: ${rawListings.length} found, ${count} saved`)
+
+    // Compute market FMV immediately after each scraper
+    if (count > 0) computeAllMarketFMV(db)
+
     return count
   } catch (err) {
     console.error(`[Scheduler] ${id} failed:`, err.message)
@@ -71,9 +75,6 @@ async function runFullScrape(db) {
     await new Promise(r => setTimeout(r, 30000))
   }
 
-  // After all scraping, compute market-driven FMV for all listings
-  console.log('[Scheduler] Computing market-driven FMV...')
-  computeAllMarketFMV(db)
   console.log('[Scheduler] Scrape cycle complete.\n')
 }
 
