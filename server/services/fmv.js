@@ -3,6 +3,7 @@ const CONDITION_MULTIPLIERS = {
   'Excellent': 0.92,
   'Very Good': 0.82,
   'Good': 0.70,
+  'Pre-Owned': 0.75,  // Unknown condition — use midpoint between Good and Very Good
   'Fair': 0.55,
 }
 

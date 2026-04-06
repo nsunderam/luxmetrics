@@ -26,7 +26,7 @@ export default function DetailModal({ listing, currency, onClose }) {
 
   // Retail base for explanation
   const retailBase = listing.retailBaseUSD ? convertCurrency(listing.retailBaseUSD, currency) : null
-  const condMultiplier = { 'New': 100, 'Excellent': 92, 'Very Good': 82, 'Good': 70, 'Fair': 55 }
+  const condMultiplier = { 'New': 100, 'Excellent': 92, 'Very Good': 82, 'Good': 70, 'Pre-Owned': 75, 'Fair': 55 }
   const condPct = condMultiplier[listing.condition] || 70
 
   // Fetch all listings for this model from API

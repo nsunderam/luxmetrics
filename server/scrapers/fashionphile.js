@@ -94,7 +94,7 @@ class FashionphileScraper {
       size: normalized.size,
       color: color,
       hardware: null,
-      condition: 'Good',
+      condition: 'Pre-Owned',
       year: null,
       accessories: [],
       localPrice: price,

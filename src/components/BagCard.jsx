@@ -23,6 +23,7 @@ const CONDITION_COLORS = {
   'Excellent': 'bg-blue-accent/15 text-blue-accent border-blue-accent/30',
   'Very Good': 'bg-amber-accent/15 text-amber-accent border-amber-accent/30',
   'Good': 'bg-orange-400/15 text-orange-400 border-orange-400/30',
+  'Pre-Owned': 'bg-slate-400/15 text-slate-500 border-slate-400/30',
   'Fair': 'bg-muted/15 text-muted border-muted/30',
 }
 
