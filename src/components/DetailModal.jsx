@@ -96,13 +96,13 @@ export default function DetailModal({ listing, currency, onClose }) {
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" onClick={onClose}>
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
       <div
-        className="relative w-full max-w-4xl max-h-[92vh] overflow-y-auto bg-white border border-graphite rounded-2xl shadow-2xl shadow-black/10 animate-fade-in"
+        className="relative w-full max-w-4xl max-h-[92vh] overflow-y-auto bg-obsidian border border-graphite rounded-2xl shadow-2xl shadow-black/40 animate-fade-in"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-graphite px-6 py-4 flex items-start justify-between">
+        <div className="sticky top-0 z-10 glass border-b border-graphite/50 px-6 py-4 flex items-start justify-between">
           <div>
-            <p className="text-[10px] text-black uppercase tracking-[0.2em] mb-1">{listing.brandName}</p>
+            <p className="text-[10px] text-gold uppercase tracking-[0.2em] mb-1">{listing.brandName}</p>
             <h2 className="text-xl font-display font-semibold text-ivory">{listing.model}</h2>
             <p className="text-sm text-silver mt-0.5">{[listing.color, listing.material, listing.size].filter(Boolean).join(' \u00b7 ')}</p>
           </div>

@@ -75,8 +75,8 @@ export default function StatsBar({ listings, currency, total, stats: apiStats })
           key={s.label}
           className={`rounded-xl p-4 animate-fade-in transition-all duration-300 hover:shadow-md
             ${s.highlight
-              ? 'bg-gradient-to-br from-emerald-accent/5 to-emerald-accent/15 border-2 border-emerald-accent/30 hover:border-emerald-accent/50'
-              : 'bg-carbon border border-graphite hover:border-steel'
+              ? 'bg-gradient-to-br from-gold/5 to-gold/15 border border-gold/30 hover:border-gold/50'
+              : 'bg-carbon border border-graphite/60 hover:border-gold/20'
             }
           `}
           style={{ animationDelay: `${i * 60}ms` }}

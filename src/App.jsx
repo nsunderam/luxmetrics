@@ -99,7 +99,7 @@ export default function App() {
         {/* Hero */}
         <div className="text-center py-6 animate-fade-in">
           <h1 className="text-3xl sm:text-4xl font-display font-semibold text-ivory tracking-tight">
-            Luxury bags, <span className="bg-gradient-to-r from-emerald-accent to-blue-accent bg-clip-text text-transparent">priced below market</span>
+            Luxury bags, <span className="bg-gradient-to-r from-gold via-gold-light to-gold bg-clip-text text-transparent">priced below market</span>
           </h1>
           <p className="text-sm text-muted mt-2 tracking-wide">
             {apiStats ? `${apiStats.totalListings.toLocaleString()} bags` : '...'} · {apiStats?.resellers || '...'} resellers · {apiStats?.brands || '...'} brands · Updated live
@@ -114,13 +114,13 @@ export default function App() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setView('grid')}
-              className={`p-2 rounded-lg transition-colors cursor-pointer ${view === 'grid' ? 'bg-black/10 text-ivory' : 'text-muted hover:text-ivory'}`}
+              className={`p-2 rounded-lg transition-colors cursor-pointer ${view === 'grid' ? 'bg-gold/10 text-gold' : 'text-muted hover:text-ivory'}`}
             >
               <LayoutGrid className="w-4 h-4" />
             </button>
             <button
               onClick={() => setView('analytics')}
-              className={`p-2 rounded-lg transition-colors cursor-pointer ${view === 'analytics' ? 'bg-black/10 text-ivory' : 'text-muted hover:text-ivory'}`}
+              className={`p-2 rounded-lg transition-colors cursor-pointer ${view === 'analytics' ? 'bg-gold/10 text-gold' : 'text-muted hover:text-ivory'}`}
             >
               <BarChart3 className="w-4 h-4" />
             </button>
@@ -152,7 +152,7 @@ export default function App() {
             {loading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {Array.from({ length: 12 }).map((_, i) => (
-                  <div key={i} className="bg-white border border-graphite rounded-xl overflow-hidden animate-fade-in" style={{ animationDelay: `${i * 40}ms` }}>
+                  <div key={i} className="bg-carbon border border-graphite/60 rounded-2xl overflow-hidden animate-fade-in" style={{ animationDelay: `${i * 40}ms` }}>
                     <div className="h-52 shimmer" />
                     <div className="p-4 space-y-3">
                       <div className="h-4 w-3/4 rounded shimmer" />
