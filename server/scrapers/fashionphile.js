@@ -127,6 +127,9 @@ class FashionphileScraper {
       'cover', 'defender', 'strap', 'charm', 'twilly',
       'wristlet', 'zip around', 'continental', 'bifold', 'trifold',
       'espadrille', 'mule', 'pump', 'slide', 'trainer',
+      'raffle', 'coupon', 'gift card', 'giftcard', 'voucher',
+      'mini hl', 'nano speedy', 'nano noe', 'nano bag',
+      'bandeau', 'headband', 'hair clip', 'barrette',
     ]
     if (excludes.some(function(e) { return combined.includes(e) })) return null
 
@@ -136,7 +139,7 @@ class FashionphileScraper {
     if (!normalized) return null
 
     const price = product.variants && product.variants[0] ? parseFloat(product.variants[0].price) : null
-    if (!price) return null
+    if (!price || price < 100) return null
 
     const image = product.images && product.images[0] ? product.images[0].src : null
     const handleMatch = (product.handle || '').match(/(\d{5,})$/)

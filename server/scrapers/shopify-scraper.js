@@ -107,6 +107,9 @@ class ShopifyScraper {
       'cover', 'defender', 'strap', 'charm', 'twilly',
       'wristlet', 'zip around', 'continental', 'bifold', 'trifold',
       'espadrille', 'mule', 'pump', 'slide', 'trainer',
+      'raffle', 'coupon', 'gift card', 'giftcard', 'voucher',
+      'mini hl', 'nano speedy', 'nano noe', 'nano bag',
+      'bandeau', 'headband', 'hair clip', 'barrette',
     ]
     if (excludes.some(function(e) { return combined.includes(e) })) return null
 
@@ -125,7 +128,7 @@ class ShopifyScraper {
     if (!normalized) return null
 
     const price = product.variants && product.variants[0] ? parseFloat(product.variants[0].price) : null
-    if (!price || price === 0) return null
+    if (!price || price < 100) return null  // Skip anything under $100 — likely raffles, accessories, or errors
 
     const image = product.images && product.images[0] ? product.images[0].src : null
     const sourceId = product.id ? String(product.id) : null
