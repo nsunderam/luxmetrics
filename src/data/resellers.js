@@ -8,4 +8,5 @@ export const RESELLERS = [
   { id: 'luxurypromise', name: 'Luxury Promise', country: 'UK', currency: 'GBP', region: 'Europe', trustScore: 4.6 },
   { id: 'luxeitfwd', name: 'Luxe.It.Fwd', country: 'AU', currency: 'AUD', region: 'Asia Pacific', trustScore: 4.5 },
   { id: 'baghunter', name: 'BagHunter', country: 'US', currency: 'USD', region: 'North America', trustScore: 4.5 },
+  { id: 'luxurysnob', name: 'Luxury Snob', country: 'IN', currency: 'USD', region: 'Asia Pacific', trustScore: 4.2 },
 ]

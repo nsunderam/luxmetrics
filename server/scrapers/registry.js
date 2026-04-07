@@ -9,6 +9,7 @@ const scraperMap = {
   luxurypromise: () => new (require('./luxurypromise'))(),
   luxeitfwd: () => new (require('./luxeitfwd'))(),
   baghunter: () => new (require('./baghunter'))(),
+  luxurysnob: () => new (require('./luxurysnob'))(),
 }
 
 function getScraper(resellerId, config) {
