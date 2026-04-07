@@ -27,6 +27,17 @@ app.use('/api/listings', listingsRouter)
 app.use('/api/stats', statsRouter)
 app.use('/api/scrapers', scrapersRouter)
 
+// eBay Marketplace Account Deletion webhook (compliance requirement)
+app.post('/api/ebay/deletion', (req, res) => {
+  console.log('[eBay] Account deletion notification received:', JSON.stringify(req.body))
+  // We don't store any eBay user data, so just acknowledge
+  res.status(200).json({ status: 'acknowledged' })
+})
+app.get('/api/ebay/deletion', (req, res) => {
+  // eBay may send a GET to verify the endpoint exists
+  res.status(200).json({ status: 'ok' })
+})
+
 // Health check
 app.get('/api/health', (req, res) => {
   const listingCount = db.prepare('SELECT COUNT(*) as c FROM listings WHERE isActive = 1').get().c
