@@ -98,6 +98,20 @@ class RebagScraper {
       if (title.toLowerCase().includes(c.toLowerCase())) { color = c; break }
     }
 
+    // Extract condition from body_html: "Condition: Very good"
+    let condition = 'Pre-Owned'
+    const body = (product.body_html || '').replace(/<[^>]+>/g, ' ')
+    const condMatch = body.match(/Condition:\s*([\w\s]+?)(?:\s*\.|$|\s{2})/i)
+    if (condMatch) {
+      const raw = condMatch[1].trim().toLowerCase()
+      if (raw === 'pristine' || raw === 'new') condition = 'New'
+      else if (raw === 'excellent') condition = 'Excellent'
+      else if (raw === 'great') condition = 'Very Good'
+      else if (raw === 'very good') condition = 'Very Good'
+      else if (raw === 'good') condition = 'Good'
+      else if (raw === 'fair') condition = 'Fair'
+    }
+
     return {
       brand: normalized.brand,
       brandName: normalized.brandName,
@@ -108,7 +122,7 @@ class RebagScraper {
       size: normalized.size,
       color: color,
       hardware: null,
-      condition: 'Pre-Owned',
+      condition: condition,
       year: null,
       accessories: [],
       localPrice: price,
