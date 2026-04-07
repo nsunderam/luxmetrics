@@ -109,8 +109,18 @@ export default function App() {
         {/* Stats */}
         <StatsBar listings={listings} currency={currency} total={total} stats={apiStats} />
 
-        {/* Analytics toggle */}
+        {/* Filters */}
+        <Filters filters={filters} onFilterChange={handleFilterChange} />
+
+        {/* Results bar: count + view toggle */}
         <div className="flex items-center justify-between">
+          <p className="text-sm text-silver font-medium">
+            <span className="text-ivory">{total.toLocaleString()}</span> listing{total !== 1 ? 's' : ''}
+            {(filters.brands.length > 0 || filters.conditions.length > 0 || filters.search || filters.reseller || filters.mispricingOnly || filters.minResellers) && (
+              <span className="text-muted"> after filters</span>
+            )}
+            {loading && <Loader2 className="w-3 h-3 inline ml-2 animate-spin" />}
+          </p>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setView('grid')}
@@ -125,14 +135,7 @@ export default function App() {
               <BarChart3 className="w-4 h-4" />
             </button>
           </div>
-          <p className="text-xs text-muted">
-            {total} listing{total !== 1 ? 's' : ''} found
-            {loading && <Loader2 className="w-3 h-3 inline ml-2 animate-spin" />}
-          </p>
         </div>
-
-        {/* Filters */}
-        <Filters filters={filters} onFilterChange={handleFilterChange} />
 
         {/* Error state */}
         {error && (
