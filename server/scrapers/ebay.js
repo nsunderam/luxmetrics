@@ -77,6 +77,7 @@ class EbayScraper {
     this.resellerId = 'ebay'
     this.clientId = process.env.EBAY_CLIENT_ID
     this.clientSecret = process.env.EBAY_CLIENT_SECRET
+    this.oauthToken = process.env.EBAY_OAUTH_TOKEN
     this.token = null
     this.tokenExpiry = 0
     this.config = {
@@ -87,10 +88,13 @@ class EbayScraper {
   }
 
   async getToken() {
+    // Use pre-generated OAuth token if available
+    if (this.oauthToken) return this.oauthToken
+
     if (this.token && Date.now() < this.tokenExpiry) return this.token
 
     if (!this.clientId || !this.clientSecret) {
-      throw new Error('EBAY_CLIENT_ID and EBAY_CLIENT_SECRET env vars required')
+      throw new Error('Set EBAY_OAUTH_TOKEN or both EBAY_CLIENT_ID and EBAY_CLIENT_SECRET')
     }
 
     const creds = Buffer.from(this.clientId + ':' + this.clientSecret).toString('base64')
