@@ -114,15 +114,19 @@ class FashionphileScraper {
       'wallet on chain', 'wallet-on-chain', 'woc',
       'wallet', 'key holder', 'key ring', 'keychain', 'phone case', 'phone pouch',
       'belt bag', 'belt-bag', 'chain belt',
-      'pochette', 'pouch crossbody', 'mini pouch', 'extra mini',
+      'pochette', 'pouch', 'o-case', 'o case', 'vanity case',
       'clutch', 'chain clutch', 'camera bag', 'camera case',
-      'mini bag', 'nano bag', 'micro bag',
+      'mini bag', 'nano bag', 'micro bag', 'nano ', 'micro ',
+      'cosmetic', 'makeup', 'toiletry',
       'scarf', 'shoes', 'sneaker', 'sandal', 'boot', 'loafer', 'heel', 'flat',
-      'watch', 'bracelet', 'necklace', 'earring', 'brooch', 'cufflink',
+      'watch', 'bracelet', 'necklace', 'earring', 'brooch', 'cufflink', 'ring ',
       'sunglasses', 'eyeglasses', 'hat', 'beanie', 'gloves', 'cap',
       'notebook', 'agenda', 'passport', 'luggage tag', 'bookmark',
-      'cosmetic case', 'vanity', 'jewelry box', 'pencil case',
+      'jewelry box', 'pencil case', 'pen case',
+      'ipad case', 'laptop sleeve', 'tech case',
       'cover', 'defender', 'strap', 'charm', 'twilly',
+      'wristlet', 'zip around', 'continental', 'bifold', 'trifold',
+      'espadrille', 'mule', 'pump', 'slide', 'trainer',
     ]
     if (excludes.some(function(e) { return combined.includes(e) })) return null
 
