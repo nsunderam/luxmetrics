@@ -10,7 +10,9 @@ async function runScrapeForReseller(id, db) {
     const run = db.prepare('INSERT INTO scrape_runs (resellerId) VALUES (?)').run(id)
     const runId = run.lastInsertRowid
 
-    const rawListings = await scraper.run()
+    // Timeout after 3 minutes per scraper
+    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Scraper timeout (3min)')), 180000))
+    const rawListings = await Promise.race([scraper.run(), timeout])
     const rates = getRates(db)
     const now = new Date().toISOString()
     let count = 0
