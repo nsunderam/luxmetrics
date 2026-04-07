@@ -23,8 +23,9 @@ const CONDITION_COLORS = {
   'Excellent': 'bg-blue-accent/10 text-blue-accent border-blue-accent/20',
   'Very Good': 'bg-amber-accent/10 text-amber-accent border-amber-accent/20',
   'Good': 'bg-orange-400/10 text-orange-500 border-orange-400/20',
+  'Shows Wear': 'bg-orange-400/10 text-orange-500 border-orange-400/20',
   'Pre-Owned': 'bg-muted/8 text-muted border-muted/15',
-  'Fair': 'bg-muted/8 text-muted border-muted/15',
+  'Fair': 'bg-rose-accent/8 text-rose-accent border-rose-accent/15',
 }
 
 export default function BagCard({ listing, currency, onClick }) {
