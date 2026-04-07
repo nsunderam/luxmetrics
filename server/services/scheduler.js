@@ -67,9 +67,9 @@ async function runFullScrape(db) {
     console.warn('[Scheduler] Currency refresh failed:', err.message)
   }
 
-  // Only run Shopify-based scrapers that don't need Playwright
-  const shopifyScrapers = ['fashionphile', 'rebag', 'luxedh', 'coutureusa']
-  for (const id of shopifyScrapers) {
+  // Run all fetch-based scrapers (Shopify + eBay API)
+  const scrapers = ['fashionphile', 'rebag', 'luxedh', 'coutureusa', 'ebay']
+  for (const id of scrapers) {
     await runScrapeForReseller(id, db)
     // 30s delay between scrapers to avoid rate limits
     await new Promise(r => setTimeout(r, 30000))
