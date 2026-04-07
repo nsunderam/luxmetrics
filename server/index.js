@@ -28,14 +28,29 @@ app.use('/api/stats', statsRouter)
 app.use('/api/scrapers', scrapersRouter)
 
 // eBay Marketplace Account Deletion webhook (compliance requirement)
+const EBAY_VERIFICATION_TOKEN = process.env.EBAY_VERIFICATION_TOKEN || 'luxmetrics_ebay_2026'
+
+app.get('/api/ebay/deletion', (req, res) => {
+  // eBay sends a challenge_code to verify the endpoint
+  const challengeCode = req.query.challenge_code
+  if (challengeCode) {
+    const crypto = require('crypto')
+    const endpoint = 'https://luxmetrics.onrender.com/api/ebay/deletion'
+    const hash = crypto.createHash('sha256')
+    hash.update(challengeCode)
+    hash.update(EBAY_VERIFICATION_TOKEN)
+    hash.update(endpoint)
+    const responseHash = hash.digest('hex')
+    console.log('[eBay] Verification challenge received, responding with hash')
+    res.status(200).json({ challengeResponse: responseHash })
+  } else {
+    res.status(200).json({ status: 'ok' })
+  }
+})
+
 app.post('/api/ebay/deletion', (req, res) => {
   console.log('[eBay] Account deletion notification received:', JSON.stringify(req.body))
-  // We don't store any eBay user data, so just acknowledge
   res.status(200).json({ status: 'acknowledged' })
-})
-app.get('/api/ebay/deletion', (req, res) => {
-  // eBay may send a GET to verify the endpoint exists
-  res.status(200).json({ status: 'ok' })
 })
 
 // Health check
