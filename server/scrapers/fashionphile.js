@@ -47,8 +47,8 @@ class FashionphileScraper {
 
     const html = await res.text()
 
-    // Extract from: <span class="h6 fp-product__condition">Excellent</span>
-    const match = html.match(/class="[^"]*fp-product__condition[^"]*"[^>]*>\s*([\w\s]+?)\s*</i)
+    // Extract from: <h2 class="h6 fp-product__condition">Excellent</h2>
+    const match = html.match(/class="h6 fp-product__condition"[^>]*>\s*([\w\s]+?)\s*</i)
     if (match) {
       const raw = match[1].trim().toLowerCase()
       if (raw === 'new' || raw === 'new with tags') return 'New'
