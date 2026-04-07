@@ -5,6 +5,10 @@ const scraperMap = {
   luxedh: () => new (require('./luxedh'))(),
   coutureusa: () => new (require('./coutureusa'))(),
   ebay: () => new (require('./ebay'))(),
+  theladybag: () => new (require('./theladybag'))(),
+  luxurypromise: () => new (require('./luxurypromise'))(),
+  luxeitfwd: () => new (require('./luxeitfwd'))(),
+  baghunter: () => new (require('./baghunter'))(),
 }
 
 function getScraper(resellerId, config) {
