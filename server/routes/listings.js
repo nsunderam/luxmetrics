@@ -111,4 +111,22 @@ router.get('/:id', (req, res) => {
   res.json(row)
 })
 
+// GET /api/listings/history/:id — price history for a single listing
+router.get('/history/:id', (req, res) => {
+  const db = req.db
+  const rows = db.prepare(
+    'SELECT priceUSD, localPrice, recordedAt FROM price_history WHERE listingId = ? ORDER BY recordedAt ASC'
+  ).all(req.params.id)
+  res.json(rows)
+})
+
+// GET /api/listings/model-history/:modelKey — median price trend for a model
+router.get('/model-history/:modelKey', (req, res) => {
+  const db = req.db
+  const rows = db.prepare(
+    'SELECT medianPriceUSD, listingCount, recordedAt FROM model_price_history WHERE modelKey = ? ORDER BY recordedAt ASC'
+  ).all(req.params.modelKey)
+  res.json(rows)
+})
+
 module.exports = router

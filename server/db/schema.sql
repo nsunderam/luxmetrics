@@ -57,3 +57,24 @@ CREATE TABLE IF NOT EXISTS currency_rates (
   rateToUSD     REAL NOT NULL,
   updatedAt     TEXT DEFAULT (datetime('now'))
 );
+
+CREATE TABLE IF NOT EXISTS price_history (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  listingId     INTEGER NOT NULL,
+  priceUSD      REAL NOT NULL,
+  localPrice    REAL NOT NULL,
+  recordedAt    TEXT DEFAULT (datetime('now')),
+  FOREIGN KEY (listingId) REFERENCES listings(id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_price_history_listing ON price_history(listingId, recordedAt);
+
+CREATE TABLE IF NOT EXISTS model_price_history (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  modelKey      TEXT NOT NULL,
+  medianPriceUSD REAL NOT NULL,
+  listingCount  INTEGER NOT NULL,
+  recordedAt    TEXT DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_model_price_history ON model_price_history(modelKey, recordedAt);

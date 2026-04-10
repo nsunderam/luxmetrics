@@ -26,6 +26,10 @@ async function runScrapeForReseller(id, db) {
         lastSeen = excluded.lastSeen, isActive = 1
     `)
 
+    // Prepare price history insert
+    const existingLookup = db.prepare('SELECT id, priceUSD FROM listings WHERE resellerId = ? AND sourceId = ?')
+    const insertHistory = db.prepare('INSERT INTO price_history (listingId, priceUSD, localPrice, recordedAt) VALUES (?, ?, ?, ?)')
+
     const tx = db.transaction(() => {
       for (const listing of rawListings) {
         if (!listing.brand || !listing.model || !listing.sourceId) continue
@@ -33,6 +37,10 @@ async function runScrapeForReseller(id, db) {
           ? listing.localPrice : convertToUSD(listing.localPrice, listing.localCurrency, rates)
         const fairValueUSD = calculateFMV(listing.modelKey, listing.condition, db)
         const mispricingPct = fairValueUSD ? calculateMispricing(priceUSD, fairValueUSD) : null
+
+        // Check existing price before upsert
+        const existing = existingLookup.get(id, listing.sourceId)
+
         upsert.run(
           listing.brand, listing.brandName, listing.tier, listing.model, listing.modelKey,
           listing.material, listing.size, listing.color, listing.hardware, listing.condition, listing.year,
@@ -40,10 +48,24 @@ async function runScrapeForReseller(id, db) {
           priceUSD, fairValueUSD, mispricingPct, listing.daysListed || 1,
           listing.image, listing.sourceUrl, listing.sourceId, now
         )
+
+        // Record price history if new listing or price changed
+        if (!existing) {
+          // New listing — get the inserted ID
+          const inserted = db.prepare('SELECT id FROM listings WHERE resellerId = ? AND sourceId = ?').get(id, listing.sourceId)
+          if (inserted) insertHistory.run(inserted.id, priceUSD, listing.localPrice, now)
+        } else if (Math.abs(existing.priceUSD - priceUSD) > 0.01) {
+          // Price changed — record new price point
+          insertHistory.run(existing.id, priceUSD, listing.localPrice, now)
+        }
+
         count++
       }
     })
     tx()
+
+    // Record model-level median prices
+    recordModelMedians(db, now)
 
     db.prepare("UPDATE scrape_runs SET completedAt = ?, status = 'completed', listingsFound = ?, listingsUpdated = ? WHERE id = ?")
       .run(now, rawListings.length, count, runId)
@@ -78,6 +100,24 @@ async function runFullScrape(db) {
   }
 
   console.log('[Scheduler] Scrape cycle complete.\n')
+}
+
+function recordModelMedians(db, now) {
+  const models = db.prepare('SELECT DISTINCT modelKey FROM listings WHERE isActive = 1').all()
+  const insertMedian = db.prepare('INSERT INTO model_price_history (modelKey, medianPriceUSD, listingCount, recordedAt) VALUES (?, ?, ?, ?)')
+
+  const tx = db.transaction(() => {
+    for (const { modelKey } of models) {
+      const prices = db.prepare('SELECT priceUSD FROM listings WHERE modelKey = ? AND isActive = 1 ORDER BY priceUSD').all(modelKey)
+      if (prices.length === 0) continue
+      const mid = Math.floor(prices.length / 2)
+      const median = prices.length % 2 === 0
+        ? (prices[mid - 1].priceUSD + prices[mid].priceUSD) / 2
+        : prices[mid].priceUSD
+      insertMedian.run(modelKey, median, prices.length, now)
+    }
+  })
+  tx()
 }
 
 function computeAllMarketFMV(db) {

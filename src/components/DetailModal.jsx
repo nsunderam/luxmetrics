@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from 'react'
 import { X, TrendingDown, TrendingUp, MapPin, Clock, Star, Package, Calendar, Tag, ArrowRight, ExternalLink } from 'lucide-react'
 import { formatPrice, convertCurrency, CURRENCIES } from '../data/currencies'
 import { RESELLERS } from '../data/resellers'
+import PriceChart from './PriceChart'
 
 export default function DetailModal({ listing, currency, onClose }) {
   if (!listing) return null
@@ -380,6 +381,14 @@ export default function DetailModal({ listing, currency, onClose }) {
               <span className="text-[9px] text-muted">{formatPrice(convertCurrency(globalMax, currency), currency)}</span>
             </div>
           </div>
+
+          {/* Price History Chart */}
+          <PriceChart
+            listingId={listing.id}
+            modelKey={listing.modelKey}
+            currentPriceUSD={listing.priceUSD}
+            currency={currency}
+          />
 
           {/* Same-condition comparables table */}
           {comparables.length > 0 && (
