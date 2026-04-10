@@ -85,6 +85,10 @@ class ShopifyScraper {
     const title = product.title
     if (!title) return null
 
+    // Skip sold-out / unavailable products
+    const variant = product.variants && product.variants[0]
+    if (variant && variant.available === false) return null
+
     // Exclude non-bag items
     const titleLower = title.toLowerCase()
     const handle = (product.handle || '').toLowerCase()
