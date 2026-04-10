@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { ChevronDown, Diamond } from 'lucide-react'
 import { CURRENCIES } from '../data/currencies'
 
-const SELECTABLE_CURRENCIES = ['USD', 'GBP', 'INR', 'AUD', 'SGD']
+const SELECTABLE_CURRENCIES = ['USD', 'GBP', 'AED', 'INR', 'AUD', 'SGD']
 
 export default function Header({ currency, onCurrencyChange }) {
   const [open, setOpen] = useState(false)
