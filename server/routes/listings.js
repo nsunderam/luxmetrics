@@ -86,8 +86,14 @@ router.get('/', (req, res) => {
       const fv = db.prepare('SELECT baseValueUSD FROM fair_values WHERE modelKey = ?').get(row.modelKey)
       fvCache[row.modelKey] = fv ? fv.baseValueUSD : null
     }
+    // Calculate days listed from firstSeen
+    const daysListed = row.firstSeen
+      ? Math.max(1, Math.ceil((Date.now() - new Date(row.firstSeen).getTime()) / 86400000))
+      : row.daysListed || 1
+
     return {
       ...row,
+      daysListed,
       accessories: row.accessories ? JSON.parse(row.accessories) : [],
       retailBaseUSD: fvCache[row.modelKey],
     }
