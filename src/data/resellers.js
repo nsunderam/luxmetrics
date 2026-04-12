@@ -3,6 +3,21 @@ export const COUNTRY_FLAGS = {
   FR: '🇫🇷', JP: '🇯🇵', HK: '🇭🇰', KR: '🇰🇷', BR: '🇧🇷',
 }
 
+// Text fallback for Windows which doesn't render flag emojis
+export const COUNTRY_LABELS = {
+  US: 'US', UK: 'UK', AU: 'AU', AE: 'UAE', IN: 'IN', SG: 'SG',
+  FR: 'FR', JP: 'JP', HK: 'HK', KR: 'KR', BR: 'BR',
+}
+
+export const COUNTRY_COLORS = {
+  US: 'bg-blue-100 text-blue-700',
+  UK: 'bg-red-100 text-red-700',
+  AU: 'bg-yellow-100 text-yellow-700',
+  AE: 'bg-emerald-100 text-emerald-700',
+  IN: 'bg-orange-100 text-orange-700',
+  SG: 'bg-red-100 text-red-700',
+}
+
 export const RESELLERS = [
   { id: 'fashionphile', name: 'Fashionphile', country: 'US', currency: 'USD', region: 'North America', trustScore: 4.8 },
   { id: 'rebag', name: 'Rebag', country: 'US', currency: 'USD', region: 'North America', trustScore: 4.7 },

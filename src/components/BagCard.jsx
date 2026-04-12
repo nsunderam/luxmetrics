@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { TrendingDown, TrendingUp, Clock, MapPin, ChevronRight } from 'lucide-react'
 import { formatPrice, convertCurrency } from '../data/currencies'
-import { RESELLERS, COUNTRY_FLAGS } from '../data/resellers'
+import { RESELLERS, COUNTRY_FLAGS, COUNTRY_LABELS, COUNTRY_COLORS } from '../data/resellers'
 
 const BRAND_GRADIENTS = {
   hermes: 'from-orange-50 to-amber-50',
@@ -140,8 +140,12 @@ export default function BagCard({ listing, currency, onClick }) {
         {/* Footer */}
         <div className="flex items-center justify-between pt-3 border-t border-graphite/60">
           <div className="flex items-center gap-1.5 text-[10px] text-muted">
-            <span className="text-sm">{reseller ? COUNTRY_FLAGS[reseller.country] || '' : ''}</span>
-            <span className="truncate max-w-[100px]">{reseller?.name}</span>
+            {reseller?.country && (
+              <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold tracking-wide ${COUNTRY_COLORS[reseller.country] || 'bg-gray-100 text-gray-600'}`}>
+                {COUNTRY_LABELS[reseller.country] || reseller.country}
+              </span>
+            )}
+            <span className="truncate max-w-[90px]">{reseller?.name}</span>
           </div>
           <div className="flex items-center gap-1.5 text-[10px] text-muted">
             <Clock className="w-3 h-3" />
