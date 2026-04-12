@@ -10,4 +10,5 @@ export const RESELLERS = [
   { id: 'baghunter', name: 'BagHunter', country: 'US', currency: 'USD', region: 'North America', trustScore: 4.5 },
   { id: 'luxurysnob', name: 'Luxury Snob', country: 'IN', currency: 'USD', region: 'Asia Pacific', trustScore: 4.2 },
   { id: 'garderobe', name: 'Garderobe', country: 'AE', currency: 'AED', region: 'Middle East', trustScore: 4.5 },
+  { id: 'bagista', name: 'Bagista', country: 'UK', currency: 'GBP', region: 'Europe', trustScore: 4.7 },
 ]

@@ -92,7 +92,7 @@ async function runFullScrape(db) {
   }
 
   // Run all fetch-based scrapers (Shopify + eBay API)
-  const scrapers = ['fashionphile', 'rebag', 'luxedh', 'coutureusa', 'ebay', 'theladybag', 'luxurypromise', 'luxeitfwd', 'baghunter', 'luxurysnob', 'garderobe']
+  const scrapers = ['fashionphile', 'rebag', 'luxedh', 'coutureusa', 'ebay', 'theladybag', 'luxurypromise', 'luxeitfwd', 'baghunter', 'luxurysnob', 'garderobe', 'bagista']
   for (const id of scrapers) {
     await runScrapeForReseller(id, db)
     // 30s delay between scrapers to avoid rate limits

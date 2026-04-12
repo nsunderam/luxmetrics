@@ -11,6 +11,7 @@ const scraperMap = {
   baghunter: () => new (require('./baghunter'))(),
   luxurysnob: () => new (require('./luxurysnob'))(),
   garderobe: () => new (require('./garderobe'))(),
+  bagista: () => new (require('./bagista'))(),
 }
 
 function getScraper(resellerId, config) {
