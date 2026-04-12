@@ -1,3 +1,8 @@
+export const COUNTRY_FLAGS = {
+  US: '🇺🇸', UK: '🇬🇧', AU: '🇦🇺', AE: '🇦🇪', IN: '🇮🇳', SG: '🇸🇬',
+  FR: '🇫🇷', JP: '🇯🇵', HK: '🇭🇰', KR: '🇰🇷', BR: '🇧🇷',
+}
+
 export const RESELLERS = [
   { id: 'fashionphile', name: 'Fashionphile', country: 'US', currency: 'USD', region: 'North America', trustScore: 4.8 },
   { id: 'rebag', name: 'Rebag', country: 'US', currency: 'USD', region: 'North America', trustScore: 4.7 },
