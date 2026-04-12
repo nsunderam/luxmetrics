@@ -16,6 +16,9 @@ const BRAND_GRADIENTS = {
   prada: 'from-slate-50 to-zinc-50',
   loewe: 'from-teal-50 to-cyan-50',
   valentino: 'from-red-50 to-pink-50',
+  gucci: 'from-green-50 to-emerald-50',
+  balenciaga: 'from-neutral-50 to-zinc-50',
+  miumiu: 'from-pink-50 to-rose-50',
 }
 
 const CONDITION_COLORS = {
