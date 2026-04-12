@@ -19,6 +19,7 @@ const BRAND_GRADIENTS = {
   gucci: 'from-green-50 to-emerald-50',
   balenciaga: 'from-neutral-50 to-zinc-50',
   miumiu: 'from-pink-50 to-rose-50',
+  chloe: 'from-amber-50 to-orange-50',
 }
 
 const CONDITION_COLORS = {

@@ -15,6 +15,7 @@ const BRAND_PATTERNS = [
   { pattern: /gucci/i, brand: 'gucci', brandName: 'Gucci', tier: 'High Luxury' },
   { pattern: /balenciaga/i, brand: 'balenciaga', brandName: 'Balenciaga', tier: 'Luxury' },
   { pattern: /miu\s*miu/i, brand: 'miumiu', brandName: 'Miu Miu', tier: 'Luxury' },
+  { pattern: /chlo[eé]|chloe/i, brand: 'chloe', brandName: 'Chloé', tier: 'Luxury' },
 ]
 
 // Model detection patterns per brand
@@ -186,6 +187,26 @@ const MODEL_PATTERNS = {
     { pattern: /matelass[eé]/i, model: 'Matelassé', size: 'Medium' },
     { pattern: /confidential/i, model: 'Confidential', size: 'Medium' },
   ],
+  chloe: [
+    { pattern: /marcie.*?(mini|small|medium|large)/i, model: 'Marcie', sizeGroup: 1 },
+    { pattern: /marcie/i, model: 'Marcie', size: 'Medium' },
+    { pattern: /woody.*?(mini|small|medium|large)/i, model: 'Woody', sizeGroup: 1 },
+    { pattern: /woody/i, model: 'Woody', size: 'Medium' },
+    { pattern: /drew.*?(mini|small|medium)/i, model: 'Drew', sizeGroup: 1 },
+    { pattern: /drew/i, model: 'Drew', size: 'Small' },
+    { pattern: /faye.*?(mini|small|medium|large)/i, model: 'Faye', sizeGroup: 1 },
+    { pattern: /faye/i, model: 'Faye', size: 'Small' },
+    { pattern: /nile/i, model: 'Nile', size: 'Small' },
+    { pattern: /tess.*?(small|medium)/i, model: 'Tess', sizeGroup: 1 },
+    { pattern: /tess/i, model: 'Tess', size: 'Small' },
+    { pattern: /aby.*?(mini|small|medium|large)/i, model: 'Aby', sizeGroup: 1 },
+    { pattern: /aby/i, model: 'Aby', size: 'Medium' },
+    { pattern: /paraty|pareti/i, model: 'Paraty', size: 'Medium' },
+    { pattern: /paddington/i, model: 'Paddington', size: 'Medium' },
+    { pattern: /baylee/i, model: 'Baylee', size: 'Medium' },
+    { pattern: /pixie/i, model: 'Pixie', size: 'Small' },
+    { pattern: /edith/i, model: 'Edith', size: 'Medium' },
+  ],
 }
 
 // Material detection
@@ -272,7 +293,7 @@ function buildModelKey(model, size, materialSlug, brand) {
     goyard: 'goyard-', bottega: 'bottega-', celine: 'celine-',
     ysl: 'ysl-', fendi: 'fendi-', prada: 'prada-', loewe: 'loewe-',
     valentino: 'valentino-', gucci: 'gucci-', balenciaga: 'balenciaga-',
-    miumiu: 'miumiu-',
+    miumiu: 'miumiu-', chloe: 'chloe-',
   }
 
   const prefix = brandPrefix[brand] || ''
