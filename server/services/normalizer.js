@@ -12,6 +12,9 @@ const BRAND_PATTERNS = [
   { pattern: /prada/i, brand: 'prada', brandName: 'Prada', tier: 'Luxury' },
   { pattern: /loewe/i, brand: 'loewe', brandName: 'Loewe', tier: 'Luxury' },
   { pattern: /valentino\s*garavani|valentino/i, brand: 'valentino', brandName: 'Valentino', tier: 'Luxury' },
+  { pattern: /gucci/i, brand: 'gucci', brandName: 'Gucci', tier: 'High Luxury' },
+  { pattern: /balenciaga/i, brand: 'balenciaga', brandName: 'Balenciaga', tier: 'Luxury' },
+  { pattern: /miu\s*miu/i, brand: 'miumiu', brandName: 'Miu Miu', tier: 'Luxury' },
 ]
 
 // Model detection patterns per brand
@@ -141,6 +144,48 @@ const MODEL_PATTERNS = {
     { pattern: /loco|locò/i, model: 'Locò', size: 'Small' },
     { pattern: /garavani/i, model: 'Garavani', size: 'Medium' },
   ],
+  gucci: [
+    { pattern: /(?:gg\s*)?marmont.*?(mini|small|medium|large)/i, model: 'GG Marmont', sizeGroup: 1 },
+    { pattern: /(?:gg\s*)?marmont/i, model: 'GG Marmont', size: 'Small' },
+    { pattern: /dionysus.*?(mini|small|medium|large)/i, model: 'Dionysus', sizeGroup: 1 },
+    { pattern: /dionysus/i, model: 'Dionysus', size: 'Small' },
+    { pattern: /jackie\s*1961.*?(mini|small|medium|large)/i, model: 'Jackie 1961', sizeGroup: 1 },
+    { pattern: /jackie\s*1961/i, model: 'Jackie 1961', size: 'Medium' },
+    { pattern: /jackie/i, model: 'Jackie 1961', size: 'Medium' },
+    { pattern: /ophidia.*?(mini|small|medium|large)/i, model: 'Ophidia', sizeGroup: 1 },
+    { pattern: /ophidia/i, model: 'Ophidia', size: 'Medium' },
+    { pattern: /bamboo\s*1947.*?(mini|small|medium)/i, model: 'Bamboo 1947', sizeGroup: 1 },
+    { pattern: /bamboo/i, model: 'Bamboo 1947', size: 'Small' },
+    { pattern: /horsebit\s*1955.*?(mini|small|medium|large)/i, model: 'Horsebit 1955', sizeGroup: 1 },
+    { pattern: /horsebit/i, model: 'Horsebit 1955', size: 'Small' },
+    { pattern: /soho.*?(small|medium|large|disco)/i, model: 'Soho', sizeGroup: 1 },
+    { pattern: /soho/i, model: 'Soho', size: 'Disco' },
+    { pattern: /sylvie.*?(mini|small|medium)/i, model: 'Sylvie', sizeGroup: 1 },
+    { pattern: /sylvie/i, model: 'Sylvie', size: 'Small' },
+    { pattern: /gucci\s*blondie/i, model: 'Blondie', size: 'Medium' },
+    { pattern: /padlock.*?(small|medium)/i, model: 'Padlock', sizeGroup: 1 },
+    { pattern: /padlock/i, model: 'Padlock', size: 'Medium' },
+  ],
+  balenciaga: [
+    { pattern: /city.*?(mini|small|medium|large)/i, model: 'City', sizeGroup: 1 },
+    { pattern: /city/i, model: 'City', size: 'Medium' },
+    { pattern: /hourglass.*?(xs|small|medium|large)/i, model: 'Hourglass', sizeGroup: 1 },
+    { pattern: /hourglass/i, model: 'Hourglass', size: 'Small' },
+    { pattern: /le\s*cagole.*?(xs|small|medium)/i, model: 'Le Cagole', sizeGroup: 1 },
+    { pattern: /le\s*cagole|cagole/i, model: 'Le Cagole', size: 'Small' },
+    { pattern: /neo\s*classic.*?(mini|small|medium|large)/i, model: 'Neo Classic', sizeGroup: 1 },
+    { pattern: /neo\s*classic/i, model: 'Neo Classic', size: 'Medium' },
+    { pattern: /papier/i, model: 'Papier', size: 'Medium' },
+    { pattern: /motorcycle|motocross/i, model: 'City', size: 'Medium' },
+  ],
+  miumiu: [
+    { pattern: /wander.*?(mini|small|medium)/i, model: 'Wander', sizeGroup: 1 },
+    { pattern: /wander/i, model: 'Wander', size: 'Medium' },
+    { pattern: /arcadie.*?(mini|small|medium)/i, model: 'Arcadie', sizeGroup: 1 },
+    { pattern: /arcadie/i, model: 'Arcadie', size: 'Medium' },
+    { pattern: /matelass[eé]/i, model: 'Matelassé', size: 'Medium' },
+    { pattern: /confidential/i, model: 'Confidential', size: 'Medium' },
+  ],
 }
 
 // Material detection
@@ -226,7 +271,8 @@ function buildModelKey(model, size, materialSlug, brand) {
     hermes: '', chanel: 'chanel-', dior: 'dior-', louisvuitton: 'lv-',
     goyard: 'goyard-', bottega: 'bottega-', celine: 'celine-',
     ysl: 'ysl-', fendi: 'fendi-', prada: 'prada-', loewe: 'loewe-',
-    valentino: 'valentino-',
+    valentino: 'valentino-', gucci: 'gucci-', balenciaga: 'balenciaga-',
+    miumiu: 'miumiu-',
   }
 
   const prefix = brandPrefix[brand] || ''
