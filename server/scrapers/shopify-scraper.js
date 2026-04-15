@@ -114,6 +114,9 @@ class ShopifyScraper {
       'raffle', 'coupon', 'gift card', 'giftcard', 'voucher',
       'mini hl', 'nano speedy', 'nano noe', 'nano bag',
       'bandeau', 'headband', 'hair clip', 'barrette',
+      'backpack', 'rucksack', 'boston bag', 'boston-bag',
+      'shopper', 'shopping bag', 'shopping tote',
+      'travel bag', 'duffle', 'duffel', 'garment bag', 'luggage',
     ]
     if (excludes.some(function(e) { return combined.includes(e) })) return null
 
