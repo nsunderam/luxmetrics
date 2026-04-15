@@ -12,9 +12,9 @@
   --color-silver: #525252;
   --color-pearl: #171717;
   --color-ivory: #0a0a0a;
-  --color-gold: #c4868c;
-  --color-gold-light: #d4a0a5;
-  --color-gold-dark: #b06b72;
+  --color-gold: #b08d57;
+  --color-gold-light: #c9a96e;
+  --color-gold-dark: #8c6d3f;
   --color-emerald-accent: #059669;
   --color-rose-accent: #e11d48;
   --color-amber-accent: #d97706;
@@ -62,8 +62,8 @@ body {
   to { opacity: 1; transform: translateX(0); }
 }
 @keyframes pulse-gold {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(196, 134, 140, 0.3); }
-  50% { box-shadow: 0 0 0 8px rgba(196, 134, 140, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(176, 141, 87, 0.3); }
+  50% { box-shadow: 0 0 0 8px rgba(176, 141, 87, 0); }
 }
 .animate-fade-in {
   animation: fadeIn 0.4s ease-out forwards;
