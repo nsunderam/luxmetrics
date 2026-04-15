@@ -16,6 +16,7 @@ const BRAND_PATTERNS = [
   { pattern: /balenciaga/i, brand: 'balenciaga', brandName: 'Balenciaga', tier: 'Luxury' },
   { pattern: /miu\s*miu/i, brand: 'miumiu', brandName: 'Miu Miu', tier: 'Luxury' },
   { pattern: /chlo[eé]|chloe/i, brand: 'chloe', brandName: 'Chloé', tier: 'Luxury' },
+  { pattern: /b[uv]lgari|\bbvlgari\b/i, brand: 'bvlgari', brandName: 'Bvlgari', tier: 'Luxury' },
 ]
 
 // Model detection patterns per brand
@@ -207,6 +208,15 @@ const MODEL_PATTERNS = {
     { pattern: /pixie/i, model: 'Pixie', size: 'Small' },
     { pattern: /edith/i, model: 'Edith', size: 'Medium' },
   ],
+  bvlgari: [
+    { pattern: /serpenti\s*forever.*?(mini|small|medium|large)/i, model: 'Serpenti Forever', sizeGroup: 1 },
+    { pattern: /serpenti\s*forever/i, model: 'Serpenti Forever', size: 'Medium' },
+    { pattern: /serpenti\s*cabochon/i, model: 'Serpenti Cabochon', size: 'Medium' },
+    { pattern: /serpenti\s*diamond\s*blast/i, model: 'Serpenti Diamond Blast', size: 'Small' },
+    { pattern: /serpenti/i, model: 'Serpenti', size: 'Medium' },
+    { pattern: /alexander.*?(small|medium|large)/i, model: 'Alexander', sizeGroup: 1 },
+    { pattern: /alexander/i, model: 'Alexander', size: 'Medium' },
+  ],
 }
 
 // Material detection
@@ -293,7 +303,7 @@ function buildModelKey(model, size, materialSlug, brand) {
     goyard: 'goyard-', bottega: 'bottega-', celine: 'celine-',
     ysl: 'ysl-', fendi: 'fendi-', prada: 'prada-', loewe: 'loewe-',
     valentino: 'valentino-', gucci: 'gucci-', balenciaga: 'balenciaga-',
-    miumiu: 'miumiu-', chloe: 'chloe-',
+    miumiu: 'miumiu-', chloe: 'chloe-', bvlgari: 'bvlgari-',
   }
 
   const prefix = brandPrefix[brand] || ''
