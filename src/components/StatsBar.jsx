@@ -1,5 +1,39 @@
+import { useState, useEffect, useRef } from 'react'
 import { TrendingDown, TrendingUp, Package, Globe, AlertTriangle, Gem } from 'lucide-react'
 import { formatPrice, convertCurrency } from '../data/currencies'
+
+function useCountUp(target, duration = 1200) {
+  const [value, setValue] = useState(0)
+  const prevTarget = useRef(0)
+
+  useEffect(() => {
+    if (target === prevTarget.current) return
+    const start = prevTarget.current
+    const diff = target - start
+    if (diff === 0) return
+    prevTarget.current = target
+
+    const startTime = Date.now()
+    const tick = () => {
+      const elapsed = Date.now() - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      // Ease out cubic
+      const eased = 1 - Math.pow(1 - progress, 3)
+      setValue(Math.round(start + diff * eased))
+      if (progress < 1) requestAnimationFrame(tick)
+    }
+    requestAnimationFrame(tick)
+  }, [target, duration])
+
+  return value
+}
+
+function AnimatedStat({ target, suffix = '', prefix = '', format = true }) {
+  const num = typeof target === 'number' ? target : parseFloat(target) || 0
+  const animated = useCountUp(num)
+  const display = format ? animated.toLocaleString() : animated
+  return <>{prefix}{display}{suffix}</>
+}
 
 export default function StatsBar({ listings, currency, total, stats: apiStats }) {
   const totalListings = apiStats?.totalListings || total || listings.length
@@ -20,14 +54,16 @@ export default function StatsBar({ listings, currency, total, stats: apiStats })
   const stats = [
     {
       label: 'Total Listings',
-      value: totalListings.toLocaleString(),
+      numValue: totalListings,
+      displayValue: <AnimatedStat target={totalListings} />,
       icon: Package,
       color: 'text-blue-accent',
       bg: 'bg-blue-accent/10',
     },
     {
       label: 'Underpriced',
-      value: underpriced.toLocaleString ? underpriced.toLocaleString() : underpriced,
+      numValue: underpriced,
+      displayValue: <AnimatedStat target={underpriced} />,
       sub: '> 10% below FMV',
       icon: TrendingDown,
       color: 'text-emerald-accent',
@@ -35,7 +71,8 @@ export default function StatsBar({ listings, currency, total, stats: apiStats })
     },
     {
       label: 'Overpriced',
-      value: overpriced.toLocaleString ? overpriced.toLocaleString() : overpriced,
+      numValue: overpriced,
+      displayValue: <AnimatedStat target={overpriced} />,
       sub: '> 15% above FMV',
       icon: TrendingUp,
       color: 'text-rose-accent',
@@ -43,7 +80,9 @@ export default function StatsBar({ listings, currency, total, stats: apiStats })
     },
     {
       label: 'Best Deal',
-      value: bestDeal?.mispricingPct != null ? `${bestDeal.mispricingPct.toFixed(0)}%` : 'N/A',
+      displayValue: bestDeal?.mispricingPct != null
+        ? <><AnimatedStat target={Math.abs(Math.round(bestDeal.mispricingPct))} prefix="-" suffix="%" format={false} /></>
+        : 'N/A',
       sub: bestDeal?.name || (bestDeal?.brandName ? `${bestDeal.brandName} ${bestDeal.model}` : ''),
       icon: Gem,
       color: 'text-emerald-accent',
@@ -52,7 +91,7 @@ export default function StatsBar({ listings, currency, total, stats: apiStats })
     },
     {
       label: 'Avg Mispricing',
-      value: `${Number(avgMispricing).toFixed(1)}%`,
+      displayValue: <><AnimatedStat target={Math.round(Number(avgMispricing) * 10) / 10} format={false} /><span>%</span></>,
       sub: `Across ${uniqueResellers} resellers`,
       icon: AlertTriangle,
       color: 'text-amber-accent',
@@ -60,7 +99,7 @@ export default function StatsBar({ listings, currency, total, stats: apiStats })
     },
     {
       label: 'Coverage',
-      value: `${uniqueResellers} Resellers`,
+      displayValue: <><AnimatedStat target={uniqueResellers} format={false} /> <span className="text-base font-normal">Resellers</span></>,
       sub: `${uniqueBrands} brands tracked`,
       icon: Globe,
       color: 'text-blue-accent',
@@ -87,7 +126,7 @@ export default function StatsBar({ listings, currency, total, stats: apiStats })
             </div>
             <span className="text-[11px] text-muted uppercase tracking-wider">{s.label}</span>
           </div>
-          <p className={`text-xl font-bold ${s.color}`}>{s.value}</p>
+          <p className={`text-xl font-bold ${s.color}`}>{s.displayValue}</p>
           {s.sub && <p className="text-[10px] text-muted mt-0.5 truncate">{s.sub}</p>}
         </div>
       ))}
