@@ -22,6 +22,7 @@ const BRAND_GRADIENTS = {
   chloe: 'from-amber-50 to-orange-50',
   bvlgari: 'from-amber-50 to-yellow-50',
   givenchy: 'from-neutral-50 to-stone-50',
+  jacquemus: 'from-blue-50 to-sky-50',
 }
 
 const CONDITION_COLORS = {
