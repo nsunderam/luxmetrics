@@ -94,6 +94,7 @@ const BRANDS = {
   bvlgari: { name: 'Bvlgari', tier: 'Luxury' },
   givenchy: { name: 'Givenchy', tier: 'Luxury' },
   jacquemus: { name: 'Jacquemus', tier: 'Luxury' },
+  mcqueen: { name: 'Alexander McQueen', tier: 'Luxury' },
 }
 
 const CONDITIONS = ['New', 'Excellent', 'Very Good', 'Good', 'Fair']

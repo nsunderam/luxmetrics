@@ -19,6 +19,7 @@ const BRAND_PATTERNS = [
   { pattern: /b[uv]lgari|\bbvlgari\b/i, brand: 'bvlgari', brandName: 'Bvlgari', tier: 'Luxury' },
   { pattern: /givenchy/i, brand: 'givenchy', brandName: 'Givenchy', tier: 'Luxury' },
   { pattern: /jacquemus/i, brand: 'jacquemus', brandName: 'Jacquemus', tier: 'Luxury' },
+  { pattern: /alexander\s*mcqueen|mcqueen/i, brand: 'mcqueen', brandName: 'Alexander McQueen', tier: 'Luxury' },
 ]
 
 // Model detection patterns per brand
@@ -242,6 +243,18 @@ const MODEL_PATTERNS = {
     { pattern: /le\s*bisou/i, model: 'Le Bisou', size: 'Small' },
     { pattern: /le\s*cuerda/i, model: 'Le Cuerda', size: 'Medium' },
     { pattern: /le\s*riviera/i, model: 'Le Riviera', size: 'Medium' },
+  ],
+  mcqueen: [
+    { pattern: /skull\s*(?:box\s*)?clutch/i, model: 'Skull Clutch', size: 'Small' },
+    { pattern: /knuckle\s*(?:ring\s*)?(?:clutch|bag)/i, model: 'Knuckle', size: 'Small' },
+    { pattern: /jewelled\s*satchel.*?(mini|small|medium)/i, model: 'Jewelled Satchel', sizeGroup: 1 },
+    { pattern: /jewelled\s*satchel/i, model: 'Jewelled Satchel', size: 'Medium' },
+    { pattern: /heroine.*?(mini|small|medium|large)/i, model: 'Heroine', sizeGroup: 1 },
+    { pattern: /heroine/i, model: 'Heroine', size: 'Medium' },
+    { pattern: /the\s*bow/i, model: 'The Bow', size: 'Medium' },
+    { pattern: /four\s*ring/i, model: 'Four Ring', size: 'Small' },
+    { pattern: /the\s*curve/i, model: 'The Curve', size: 'Medium' },
+    { pattern: /the\s*seal/i, model: 'The Seal', size: 'Medium' },
     { pattern: /alexander.*?(small|medium|large)/i, model: 'Alexander', sizeGroup: 1 },
     { pattern: /alexander/i, model: 'Alexander', size: 'Medium' },
   ],
@@ -331,7 +344,7 @@ function buildModelKey(model, size, materialSlug, brand) {
     goyard: 'goyard-', bottega: 'bottega-', celine: 'celine-',
     ysl: 'ysl-', fendi: 'fendi-', prada: 'prada-', loewe: 'loewe-',
     valentino: 'valentino-', gucci: 'gucci-', balenciaga: 'balenciaga-',
-    miumiu: 'miumiu-', chloe: 'chloe-', bvlgari: 'bvlgari-', givenchy: 'givenchy-', jacquemus: 'jacquemus-',
+    miumiu: 'miumiu-', chloe: 'chloe-', bvlgari: 'bvlgari-', givenchy: 'givenchy-', jacquemus: 'jacquemus-', mcqueen: 'mcqueen-',
   }
 
   const prefix = brandPrefix[brand] || ''
