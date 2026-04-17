@@ -5,7 +5,9 @@ import Filters from './components/Filters'
 import BagCard from './components/BagCard'
 import DetailModal from './components/DetailModal'
 import MispricingChart from './components/MispricingChart'
-import { LayoutGrid, BarChart3, Loader2, Diamond, Search } from 'lucide-react'
+import MapView from './components/MapView'
+import { RESELLERS } from './data/resellers'
+import { LayoutGrid, BarChart3, Globe, Loader2, Diamond, Search } from 'lucide-react'
 
 export default function App() {
   const [currency, setCurrency] = useState('USD')
@@ -134,6 +136,12 @@ export default function App() {
             >
               <BarChart3 className="w-4 h-4" />
             </button>
+            <button
+              onClick={() => setView('map')}
+              className={`p-2 rounded-lg transition-colors cursor-pointer ${view === 'map' ? 'bg-gold/10 text-gold-dark' : 'text-muted hover:text-ivory'}`}
+            >
+              <Globe className="w-4 h-4" />
+            </button>
           </div>
         </div>
 
@@ -148,6 +156,22 @@ export default function App() {
 
         {/* Analytics View */}
         {view === 'analytics' && <MispricingChart listings={listings} />}
+
+        {/* Map View */}
+        {view === 'map' && (
+          <MapView
+            listings={listings}
+            apiStats={apiStats}
+            currency={currency}
+            onCountryClick={(countryCode) => {
+              const countryResellers = RESELLERS.filter(r => r.country === countryCode)
+              if (countryResellers.length > 0) {
+                setFilters(prev => ({ ...prev, reseller: countryResellers[0].id }))
+                setView('grid')
+              }
+            }}
+          />
+        )}
 
         {/* Grid View */}
         {view === 'grid' && !error && (
