@@ -51,4 +51,20 @@ router.get('/resellers', (req, res) => {
   res.json(result)
 })
 
+// GET /api/stats/map — aggregated stats per reseller for the map view
+router.get('/map', (req, res) => {
+  const db = req.db
+
+  const rows = db.prepare(`
+    SELECT resellerId,
+      COUNT(*) as listings,
+      ROUND(AVG(priceUSD), 0) as avgPrice,
+      SUM(CASE WHEN mispricingPct < -5 THEN 1 ELSE 0 END) as underpriced
+    FROM listings WHERE isActive = 1
+    GROUP BY resellerId
+  `).all()
+
+  res.json(rows)
+})
+
 module.exports = router

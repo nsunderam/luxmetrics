@@ -21,39 +21,34 @@ export default function MapView({ listings, apiStats, currency, onCountryClick }
   const [countryStats, setCountryStats] = useState({})
 
   useEffect(() => {
-    if (!listings || listings.length === 0) return
+    // Fetch aggregated stats from the server (all listings, not paginated)
+    fetch('/api/stats/map')
+      .then(function(r) { return r.json() })
+      .then(function(rows) {
+        const stats = {}
+        rows.forEach(function(row) {
+          const reseller = RESELLERS.find(function(r) { return r.id === row.resellerId })
+          if (!reseller) return
+          const country = reseller.country
+          if (!stats[country]) {
+            stats[country] = { listings: 0, resellers: new Set(), totalPrice: 0, underpriced: 0 }
+          }
+          stats[country].listings += row.listings
+          stats[country].resellers.add(row.resellerId)
+          stats[country].totalPrice += (row.avgPrice || 0) * row.listings
+          stats[country].underpriced += row.underpriced || 0
+        })
 
-    const stats = {}
-    listings.forEach(function(l) {
-      const reseller = RESELLERS.find(function(r) { return r.id === l.resellerId })
-      if (!reseller) return
-      const country = reseller.country
-      if (!stats[country]) {
-        stats[country] = {
-          listings: 0,
-          resellers: new Set(),
-          totalPrice: 0,
-          underpriced: 0,
-          bestDeal: null,
-        }
-      }
-      stats[country].listings++
-      stats[country].resellers.add(l.resellerId)
-      stats[country].totalPrice += l.priceUSD || 0
-      if (l.mispricingPct && l.mispricingPct < -5) stats[country].underpriced++
-      if (!stats[country].bestDeal || (l.mispricingPct && l.mispricingPct < (stats[country].bestDeal.mispricingPct || 0))) {
-        stats[country].bestDeal = l
-      }
-    })
+        Object.keys(stats).forEach(function(k) {
+          stats[k].resellerCount = stats[k].resellers.size
+          stats[k].avgPrice = stats[k].listings > 0 ? Math.round(stats[k].totalPrice / stats[k].listings) : 0
+          delete stats[k].resellers
+        })
 
-    Object.keys(stats).forEach(function(k) {
-      stats[k].resellerCount = stats[k].resellers.size
-      stats[k].avgPrice = stats[k].listings > 0 ? Math.round(stats[k].totalPrice / stats[k].listings) : 0
-      delete stats[k].resellers
-    })
-
-    setCountryStats(stats)
-  }, [listings])
+        setCountryStats(stats)
+      })
+      .catch(function() {})
+  }, [])
 
   // Build data for react-svg-worldmap
   const mapData = useMemo(() => {
