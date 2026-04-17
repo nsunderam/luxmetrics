@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo } from 'react'
 import WorldMap from 'react-svg-worldmap'
-import { Globe, MapPin, TrendingDown } from 'lucide-react'
+import { Globe, MapPin, TrendingDown, ChevronDown } from 'lucide-react'
 import { RESELLERS, COUNTRY_LABELS } from '../data/resellers'
+import { BRANDS } from '../data/bags'
 import { formatPrice, convertCurrency } from '../data/currencies'
 
 const COUNTRY_NAMES = {
@@ -10,19 +11,27 @@ const COUNTRY_NAMES = {
   FR: 'France', JP: 'Japan', DE: 'Germany',
 }
 
-// react-svg-worldmap uses lowercase ISO codes, and UK = gb
+const CONDITIONS = ['New', 'Excellent', 'Very Good', 'Good', 'Shows Wear', 'Pre-Owned', 'Fair']
+
 function toIso(code) {
   if (code === 'UK') return 'gb'
   return code.toLowerCase()
 }
 
-export default function MapView({ listings, apiStats, currency, onCountryClick }) {
+export default function MapView({ apiStats, currency, onCountryClick }) {
   const [selectedCountry, setSelectedCountry] = useState(null)
   const [countryStats, setCountryStats] = useState({})
+  const [selectedBrand, setSelectedBrand] = useState('')
+  const [selectedCondition, setSelectedCondition] = useState('')
 
   useEffect(() => {
-    // Fetch aggregated stats from the server (all listings, not paginated)
-    fetch('/api/stats/map')
+    let url = '/api/stats/map'
+    const params = []
+    if (selectedBrand) params.push('brand=' + selectedBrand)
+    if (selectedCondition) params.push('condition=' + selectedCondition)
+    if (params.length > 0) url += '?' + params.join('&')
+
+    fetch(url)
       .then(function(r) { return r.json() })
       .then(function(rows) {
         const stats = {}
@@ -46,11 +55,12 @@ export default function MapView({ listings, apiStats, currency, onCountryClick }
         })
 
         setCountryStats(stats)
+        // Clear selection if filtered country has no results
+        if (selectedCountry && !stats[selectedCountry]) setSelectedCountry(null)
       })
       .catch(function() {})
-  }, [])
+  }, [selectedBrand, selectedCondition])
 
-  // Build data for react-svg-worldmap
   const mapData = useMemo(() => {
     return Object.entries(countryStats).map(function([code, stats]) {
       return { country: toIso(code), value: stats.listings }
@@ -59,34 +69,30 @@ export default function MapView({ listings, apiStats, currency, onCountryClick }
 
   const activeCountries = Object.keys(countryStats)
   const totalCountries = activeCountries.length
-  const totalResellers = apiStats?.resellers || 0
-  const totalListings = apiStats?.totalListings || listings.length
+  const totalListings = activeCountries.reduce(function(sum, c) { return sum + countryStats[c].listings }, 0)
+  const totalResellers = new Set(activeCountries.flatMap(function(c) {
+    return RESELLERS.filter(function(r) { return r.country === c }).map(function(r) { return r.id })
+  })).size
 
-  function handleClick(event) {
-    // event has countryCode in uppercase
-    const code = event.countryCode
-    const ourCode = code === 'GB' ? 'UK' : code
-    if (countryStats[ourCode]) {
-      setSelectedCountry(ourCode)
-    }
-  }
-
-  function handleViewListings(countryCode) {
-    if (onCountryClick) onCountryClick(countryCode)
-  }
+  const filterLabel = [
+    selectedBrand ? BRANDS[selectedBrand]?.name : null,
+    selectedCondition || null,
+  ].filter(Boolean).join(' · ') || 'All Bags'
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-graphite/30 overflow-hidden">
-      {/* Header */}
-      <div className="px-6 py-5 border-b border-graphite/30">
-        <div className="flex items-center justify-between flex-wrap gap-4">
+      {/* Header with filters */}
+      <div className="px-6 py-4 border-b border-graphite/30">
+        <div className="flex items-center justify-between flex-wrap gap-4 mb-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center shadow-md shadow-gold/20">
               <Globe className="w-5 h-5 text-white" />
             </div>
             <div>
               <h2 className="font-display text-lg font-semibold text-ivory">Global Market Coverage</h2>
-              <p className="text-xs text-muted mt-0.5">Click a country to explore listings</p>
+              <p className="text-xs text-muted mt-0.5">
+                {filterLabel} · {totalListings.toLocaleString()} listings across {totalCountries} countries
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-6 text-sm">
@@ -95,31 +101,67 @@ export default function MapView({ listings, apiStats, currency, onCountryClick }
               <p className="text-[10px] text-muted uppercase tracking-wide">Countries</p>
             </div>
             <div className="text-center">
-              <p className="text-xl font-bold text-ivory">{totalResellers}</p>
-              <p className="text-[10px] text-muted uppercase tracking-wide">Resellers</p>
-            </div>
-            <div className="text-center">
               <p className="text-xl font-bold text-gold-dark">{totalListings.toLocaleString()}</p>
               <p className="text-[10px] text-muted uppercase tracking-wide">Listings</p>
             </div>
           </div>
         </div>
+
+        {/* Filters */}
+        <div className="flex items-center gap-3 flex-wrap">
+          <select
+            value={selectedBrand}
+            onChange={function(e) { setSelectedBrand(e.target.value) }}
+            className="px-3 py-1.5 rounded-lg border border-graphite/40 bg-white text-xs text-ivory cursor-pointer hover:border-gold/40 transition-colors"
+          >
+            <option value="">All Brands</option>
+            {Object.entries(BRANDS).map(function([key, b]) {
+              return <option key={key} value={key}>{b.name}</option>
+            })}
+          </select>
+
+          <select
+            value={selectedCondition}
+            onChange={function(e) { setSelectedCondition(e.target.value) }}
+            className="px-3 py-1.5 rounded-lg border border-graphite/40 bg-white text-xs text-ivory cursor-pointer hover:border-gold/40 transition-colors"
+          >
+            <option value="">All Conditions</option>
+            {CONDITIONS.map(function(c) {
+              return <option key={c} value={c}>{c}</option>
+            })}
+          </select>
+
+          {(selectedBrand || selectedCondition) && (
+            <button
+              onClick={function() { setSelectedBrand(''); setSelectedCondition('') }}
+              className="px-3 py-1.5 rounded-lg text-xs text-gold-dark hover:bg-gold/10 transition-colors cursor-pointer"
+            >
+              Clear filters
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Map */}
-      <div className="p-4 flex justify-center">
+      {/* Full-width Map */}
+      <div className="w-full" style={{ minHeight: '500px' }}>
         <WorldMap
           color="#b08d57"
           tooltipBgColor="#1a1a1a"
           tooltipTextColor="#ffffff"
           valueSuffix=" listings"
-          size="responsive"
+          size="xxl"
           data={mapData}
           backgroundColor="white"
           borderColor="#e5e5e5"
-          onClickFunction={handleClick}
-          styleFunction={(context) => {
-            const { countryCode, countryValue, minValue, maxValue, color } = context
+          onClickFunction={function(event) {
+            const code = event.countryCode
+            const ourCode = code === 'GB' ? 'UK' : code
+            if (countryStats[ourCode]) {
+              setSelectedCountry(ourCode)
+            }
+          }}
+          styleFunction={function(context) {
+            const { countryCode, countryValue, maxValue } = context
             const ourCode = countryCode === 'GB' ? 'UK' : countryCode
             const isActive = countryStats[ourCode]
             const isSelected = selectedCountry === ourCode
@@ -134,13 +176,13 @@ export default function MapView({ listings, apiStats, currency, onCountryClick }
             }
 
             const hasDeals = countryStats[ourCode]?.underpriced > 0
-            const opacity = 0.6 + (countryValue / (maxValue || 1)) * 0.4
+            const opacity = 0.5 + (countryValue / (maxValue || 1)) * 0.5
 
             return {
               fill: hasDeals ? '#059669' : '#b08d57',
               fillOpacity: opacity,
               stroke: isSelected ? '#8c6d3f' : '#ffffff',
-              strokeWidth: isSelected ? 2 : 1,
+              strokeWidth: isSelected ? 2.5 : 1,
               cursor: 'pointer',
               transition: 'all 0.2s ease',
             }
@@ -160,9 +202,7 @@ export default function MapView({ listings, apiStats, currency, onCountryClick }
             return (
               <button
                 key={code}
-                onClick={function() {
-                  setSelectedCountry(code)
-                }}
+                onClick={function() { setSelectedCountry(code) }}
                 className={`p-3 rounded-xl text-left transition-all cursor-pointer border
                   ${isSelected
                     ? 'border-gold bg-gold/5 shadow-md shadow-gold/10'
@@ -198,9 +238,10 @@ export default function MapView({ listings, apiStats, currency, onCountryClick }
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-gold-dark" />
                 <h3 className="font-semibold text-sm text-ivory">{COUNTRY_NAMES[selectedCountry] || selectedCountry}</h3>
+                {selectedBrand && <span className="text-xs text-muted">· {BRANDS[selectedBrand]?.name}</span>}
               </div>
               <button
-                onClick={function() { handleViewListings(selectedCountry) }}
+                onClick={function() { onCountryClick && onCountryClick(selectedCountry) }}
                 className="px-4 py-1.5 rounded-lg bg-gold-dark text-white text-xs font-semibold hover:bg-gold transition-colors cursor-pointer"
               >
                 View {countryStats[selectedCountry].listings} listings

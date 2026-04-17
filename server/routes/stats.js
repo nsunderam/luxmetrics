@@ -54,15 +54,33 @@ router.get('/resellers', (req, res) => {
 // GET /api/stats/map — aggregated stats per reseller for the map view
 router.get('/map', (req, res) => {
   const db = req.db
+  const { brand, condition } = req.query
+
+  let where = ['isActive = 1']
+  const params = []
+
+  if (brand) {
+    const brands = brand.split(',')
+    where.push(`brand IN (${brands.map(() => '?').join(',')})`)
+    params.push(...brands)
+  }
+
+  if (condition) {
+    const conditions = condition.split(',')
+    where.push(`condition IN (${conditions.map(() => '?').join(',')})`)
+    params.push(...conditions)
+  }
+
+  const whereClause = where.join(' AND ')
 
   const rows = db.prepare(`
     SELECT resellerId,
       COUNT(*) as listings,
       ROUND(AVG(priceUSD), 0) as avgPrice,
       SUM(CASE WHEN mispricingPct < -5 THEN 1 ELSE 0 END) as underpriced
-    FROM listings WHERE isActive = 1
+    FROM listings WHERE ${whereClause}
     GROUP BY resellerId
-  `).all()
+  `).all(...params)
 
   res.json(rows)
 })
