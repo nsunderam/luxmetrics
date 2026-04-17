@@ -92,6 +92,7 @@ const BRANDS = {
   miumiu: { name: 'Miu Miu', tier: 'Luxury' },
   chloe: { name: 'Chloé', tier: 'Luxury' },
   bvlgari: { name: 'Bvlgari', tier: 'Luxury' },
+  givenchy: { name: 'Givenchy', tier: 'Luxury' },
 }
 
 const CONDITIONS = ['New', 'Excellent', 'Very Good', 'Good', 'Fair']

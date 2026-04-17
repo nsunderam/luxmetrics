@@ -21,6 +21,7 @@ const BRAND_GRADIENTS = {
   miumiu: 'from-pink-50 to-rose-50',
   chloe: 'from-amber-50 to-orange-50',
   bvlgari: 'from-amber-50 to-yellow-50',
+  givenchy: 'from-neutral-50 to-stone-50',
 }
 
 const CONDITION_COLORS = {
